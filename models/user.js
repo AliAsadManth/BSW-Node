@@ -21,15 +21,11 @@ const userSchema = mongoose.Schema({
     },
     role: {
         type: String,
-        required: true,
+        default: "user",
     },
     phone_no: {
         type: String,
-    },
-    time : {
-        type : Date,
-        default: Date.now
     }
-});
+},{ timestamps: true });
 
 module.exports = mongoose.model("user", userSchema);

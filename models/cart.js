@@ -18,11 +18,7 @@ const cartSchema = mongoose.Schema({
     orderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "orders",
-    },
-    time: {
-        type: Date,
-        default: Date.now
     }
-});
+},{ timestamps: true });
 
 module.exports = mongoose.model("cart", cartSchema);

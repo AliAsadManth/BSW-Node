@@ -23,10 +23,11 @@ mongoose.connect(url, {
 mongoose.connection.once("open", () => console.log("Connected to mongoDB :)"));
 
 // Routes
+app.use("/user", require("./routes/user"));
+
 app.get("/", (req, res)=>{
   res.send("Haalo");
 });
-
 
 
 // listening to server

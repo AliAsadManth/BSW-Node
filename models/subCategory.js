@@ -8,11 +8,7 @@ const subCategorySchema = mongoose.Schema({
     parentCategory: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "category",
-    },
-    time : {
-        type : Date,
-        default: Date.now
     }
-});
+},{ timestamps: true });
 
 module.exports = mongoose.model("subCategory", subCategorySchema);

@@ -17,11 +17,7 @@ const orderSchema = mongoose.Schema({
     },
     grandTotal: {
         type: Number,
-    },
-    time: {
-        type: Date,
-        default: Date.now,
     }
-});
+},{ timestamps: true });
 
 module.exports = mongoose.model("order", orderSchema);

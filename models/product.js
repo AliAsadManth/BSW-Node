@@ -24,11 +24,7 @@ const productSchema = mongoose.Schema({
     description: {
         type: String,
         required: true,
-    },
-    time: {
-        type: Date,
-        default: Date.now
     }
-});
+},{ timestamps: true });
 
 module.exports = mongoose.model("product", productSchema);

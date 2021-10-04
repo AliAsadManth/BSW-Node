@@ -6,7 +6,8 @@ const {
     createUser,
     getAllUsers,
     getUserById,
-    updateUser
+    updateUser,
+    updatePassword
 } = require("../controllers/user");
 
 //TODO: User Routes
@@ -14,5 +15,6 @@ router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.post("/create", createUser);
 router.put("/update/:id", updateUser);
+router.put("/update/password/:id", updatePassword);
 
 module.exports = router;

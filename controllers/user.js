@@ -22,67 +22,93 @@ async function getUserById(req, res){
 }
 async function createUser(req, res) {
     let body = req.body;
-    let chk, chk2, chk3 = false;
     try{
         let email = await User.countDocuments({"email": body.email});
         if(email !== 0){
-            chk = false;
             res.json({emailErr: "Email Already exist"});
-        }else{
-            chk = true;
+            return;
         }
         let phone = await User.countDocuments({"phone_no": body.phone_no});
         if(phone !== 0){
-            chk2 = false;
             res.json({phoneErr: "Phone Number Already exist"});
-        }else{
-            chk2 = true;
+            return;
         }
         let userObj = new User(body);
         
         if(body.password.length < 8){
-            chk3 = false;
             res.json({passErr: "Password must be greater or equal to 8 characters"});
-        }else{
-            chk3 = true;
-            userObj.password = bcrypt.hashSync(body.password, 10);
+            return;
         }
-        if(chk && chk2 && chk3){
-            await User.create(userObj).then(()=> {
-                res.status(200).json({message: "User Created!"});   
-            });
-        }
+        userObj.password = bcrypt.hashSync(body.password, 10);
+        await User.create(userObj).then(()=> {
+            res.status(200).json({message: "User Created!"});   
+        });
     }catch(err){
         res.status(500).json(err);
     }
 }
-
+//! Update all info insted Password here...
 async function updateUser(req, res) {
     let body = req.body;
     try{
         //? All users expet this to check email emails and pass
         let users = await User.find({_id: {$ne: req.params.id}});
         
+        //? Current user
         let currentUser = await User.findById(req.params.id);
 
         users.forEach((singleUser) => {
             if(singleUser.phone_no === body.phone_no){
                 res.json({phoneErr: "Phone Number Already exist"});
+                return;
             }
         });
-        res.json({Message: "Haalo"});
-
-        // await User.findByIdAndUpdate(req.params.id, body).then(() => {
-        //     res.status(200).json({message: "User updated Sucessfully!"});
-        // });
+        //! if phone number did't exist...
+        await User.findByIdAndUpdate(req.params.id, body).then(() => {
+            res.status(200).json({message: "User updated Sucessfully!"});
+        });       
     }catch(err){
         res.status(500).json(err);
     }
 }
+async function updatePassword(req, res) {
+    let body = req.body;
+    try{
+        let thisUser = await User.findById(req.params.id);
 
+        bcrypt.compare(body.oldPass, thisUser.password, function(err, result) {
+            if(result){
+                if(body.newPass === body.newPassConfirm){
+                    bcrypt.compare(body.newPass, thisUser.password, function(err, result) {
+                        if(result){
+                            res.json({passErr: "New password cannot be same as Old Password!"});
+                            return;
+                        }else{
+                            // TODO: Change Password here...
+                            thisUser.password = bcrypt.hashSync(body.newPass, 10);
+                            User.findByIdAndUpdate(req.params.id, thisUser).then(() => {
+                                res.status(200).json({message: "Password updated Sucessfully!"});
+                            });
+                        }
+                    });
+                }
+                else{
+                    res.json({passErr: "Please Confirm your Password!"});
+                    return;
+                }
+            }else{
+                res.json({passErr: "Password didn't match!"});
+                    return;
+            }
+        });
+    }catch(err){
+        res.status(500).json(err);
+    }
+}
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
-    updateUser
+    updateUser,
+    updatePassword
 }

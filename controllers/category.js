@@ -1,4 +1,3 @@
-const { post } = require("../routes/user");
 const db = require("../utils/db");
 const Category = db.Category;
 const SubCategory = db.SubCategory;
@@ -73,15 +72,7 @@ async function updateSubCategory(req, res) {
         res.status(500).json(err);
     }
 }
-async function PopulateChk(req, res) {
-    try {
-        SubCategory.findOne({ id: req.params.id }).populate('parentCategory').exec((err, results) => {
-            res.json({ results: results, err: err });
-        });
-    } catch (err) {
-        res.status(500).json(err);
-    }
-}
+
 module.exports = {
     getAllCategory,
     createCategory,
@@ -92,6 +83,4 @@ module.exports = {
     getAllSubCategory,
     deleteSubCategory,
     updateSubCategory,
-
-    PopulateChk,
 }

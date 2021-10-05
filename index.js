@@ -25,10 +25,12 @@ mongoose.connection.once("open", () => console.log("Connected to mongoDB :)"));
 // Routes
 app.use("/user", require("./routes/user"));
 app.use("/category", require("./routes/category"));
+app.use("/product", require("./routes/product"));
 app.get("/", (req, res)=>{
   res.send("Haalo");
 });
 
+app.use("/uploads/images", express.static("./uploads/images"));
 
 // listening to server
 app.listen(port, () => console.log("Server is running on port: " + port));

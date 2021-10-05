@@ -5,9 +5,9 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    imgUrl: {
+    image: {
         type: String,
-        default: "default_image_url",
+        default: "Uploads\\images\\default.jpg",
     },
     stock: {
         type: Number,

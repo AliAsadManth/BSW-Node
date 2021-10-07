@@ -27,6 +27,7 @@ mongoose.connection.once("open", () => console.log("Connected to mongoDB :)"));
 app.use("/user", require("./routes/user"));
 app.use("/category", require("./routes/category"));
 app.use("/product", require("./routes/product"));
+app.use("/cart", require("./routes/cart"));
 app.get("/", (req, res)=>{
   res.send("Haalo");
 });

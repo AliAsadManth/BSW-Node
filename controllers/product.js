@@ -1,4 +1,3 @@
-const { Mongoose } = require("mongoose");
 const db = require("../utils/db");
 const Product = db.Product;
 
@@ -89,13 +88,15 @@ async function searchProducts(req, res) {
       let results = await Product.find({name : { $regex : regex}, status : true});
       res.status(200).json(results);
     }else{
-      let results = await Product.find({status : true});
-      res.status(200).json(results);
+      // let results = await Product.find({status : true});
+      // res.status(200).json(results);
+      res.status(200).json();
     }
   } catch (err) {
     res.status(500).json(err);
   }
 }
+
 module.exports = {
   getAllProducts,
   addProduct,

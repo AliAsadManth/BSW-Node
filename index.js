@@ -37,12 +37,9 @@ mongoose.connection.once("open", () => console.log("Connected to mongoDB :)"));
 
 //? Routes
 app.use("/api/user", require("./routes/user"));
-app.use("/category", require("./routes/category"));
-app.use("/product", require("./routes/product"));
-app.use("/cart", require("./routes/cart"));
-app.get("/", (req, res)=>{
-  res.send("Haalo");
-});
+app.use("/api/category", require("./routes/category"));
+app.use("/api/product", require("./routes/product"));
+app.use("/api/cart", require("./routes/cart"));
 
 app.use("/uploads/images", express.static("./uploads/images"));
 

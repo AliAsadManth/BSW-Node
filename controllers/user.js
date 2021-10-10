@@ -1,6 +1,8 @@
 const db = require("../utils/db");
 const bcrypt = require("bcrypt");
 const User = db.User;
+const passport = require("passport");
+require("../utils/passportConfig")(passport);
 
 async function getAllUsers(req, res){
     try{
@@ -54,7 +56,7 @@ async function updateUser(req, res) {
         let users = await User.find({_id: {$ne: req.params.id}});
         
         //? Current user
-        let currentUser = await User.findById(req.params.id);
+        //! let currentUser = await User.findById(req.params.id);
 
         users.forEach((singleUser) => {
             if(singleUser.phone_no === body.phone_no){
@@ -104,10 +106,58 @@ async function updatePassword(req, res) {
         res.status(500).json(err);
     }
 }
+
+async function login(req, res, next) {
+    try {
+        console.log("login")
+      passport.authenticate("local", (err, user) => {
+        if (err) throw err;
+  
+        if (!user) {
+          res.send("Invalid email or password");
+        } else {
+          req.logIn(user, (err) => {
+            if (err) throw err;
+            res.send(user);
+          });
+        }
+      })(req, res, next);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+
+  function checkAuth(req, res, next) {
+      console.log("auth")
+    if (req.isAuthenticated()) {
+      return next();
+    } else {
+      res.json({ error: "Authenctication Failed" });
+    }
+  }
+
+  async function loggedIn(req, res) {
+      console.log("logged in")
+    res.json({ status: 200, user: req.user });
+  }
+
+  async function logout(req, res) {
+    try {
+      req.logOut();
+      res.status(200).send("Logout successfully");
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  }
+
 module.exports = {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
-    updatePassword
+    updatePassword,
+    login,
+    checkAuth,
+    loggedIn,
+    logout
 }

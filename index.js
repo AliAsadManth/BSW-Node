@@ -40,8 +40,13 @@ app.use("/api/user", require("./routes/user"));
 app.use("/api/category", require("./routes/category"));
 app.use("/api/product", require("./routes/product"));
 app.use("/api/cart", require("./routes/cart"));
-
+app.use("/api/slider", require("./routes/slider"));
 app.use("/uploads/images", express.static("./uploads/images"));
+
+//? Test Route
+app.use("/", (req, res)=>{
+  res.send("<center><h1 style='color:Tomato; font-size: 100;'>Main Page!</h1></center>")
+});
 
 //? listening to server
 app.listen(port, () => console.log("Server is running on port: " + port));

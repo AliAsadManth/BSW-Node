@@ -1,1 +1,0 @@
-// TODO: SLider Miss Karao

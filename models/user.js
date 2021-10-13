@@ -19,12 +19,21 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    status: {
+        type: Boolean,
+        default: false,
+    },
+    otp: {
+        type: String,
+        require: true,
+    },
     role: {
         type: String,
         default: "user",
     },
     phone_no: {
         type: String,
+        unique: true,
     }
 },{ timestamps: true });
 

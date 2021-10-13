@@ -5,4 +5,5 @@ module.exports ={
     Category: require("../models/category"),
     SubCategory: require("../models/subCategory"),
     Order: require("../models/order"),
+    Slider: require("../models/slider"),
 };

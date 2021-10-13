@@ -22,6 +22,9 @@ async function getUserById(req, res){
     } 
 }
 async function createUser(req, res) {
+    var chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var otpLength = 15;
+    var otp = "";
     let body = req.body;
     try{
         let email = await User.countDocuments({"email": body.email});
@@ -29,7 +32,11 @@ async function createUser(req, res) {
             res.json({emailErr: "Email Already exist"});
             return;
         }
-        let phone = await User.countDocuments({"phone_no": body.phone_no});
+        let phone = await User.countDocuments({"phone_no": "+61"+body.phone_no});
+        if(body.phone_no.length !== 9){
+            res.json({phoneErr: "Wrong Phone Number Format, Phone number must be 9 digits."});
+            return;
+        }
         if(phone !== 0){
             res.json({phoneErr: "Phone Number Already exist"});
             return;
@@ -40,9 +47,21 @@ async function createUser(req, res) {
             res.json({passErr: "Password must be greater or equal to 8 characters"});
             return;
         }
+        for (var i = 0; i <= otpLength; i++) {
+            var randomNumber = Math.floor(Math.random() * chars.length);
+            otp += chars.substring(randomNumber, randomNumber +1);
+        }
+        userObj.otp = otp;
+        userObj.phone_no = "+61"+body.phone_no;
         userObj.password = bcrypt.hashSync(body.password, 10);
-        await User.create(userObj).then(()=> {
-            res.status(200).json({message: "User Created!"});   
+        await User.create(userObj).then(createdUser => {
+            
+            let hostName = `${req.protocol}://${req.headers.host}`;
+            let verificationUrl = `${hostName}/api/user/userverification/${createdUser._id}/${otp}?Please_DONOT_CHANGE_THIS_URL`; 
+            
+            //TODO: SEND Verification Email...
+            
+            res.status(200).json({message: "User Created!", verificationUrl: verificationUrl});
         });
     }catch(err){
         res.status(500).json(err);
@@ -55,16 +74,21 @@ async function updateUser(req, res) {
         //? All users expet this to check email emails and pass
         let users = await User.find({_id: {$ne: req.params.id}});
         
-        //? Current user
-        //! let currentUser = await User.findById(req.params.id);
+        // ? Current user
+        // let currentUser = await User.findById(req.params.id);
 
         users.forEach((singleUser) => {
-            if(singleUser.phone_no === body.phone_no){
+            if(singleUser.phone_no === "+61"+body.phone_no){
                 res.json({phoneErr: "Phone Number Already exist"});
                 return;
             }
         });
-        //! if phone number did't exist...
+        if(body.phone_no.length !== 9){
+            res.json({phoneErr: "Wrong Phone Number Format, Phone number must be 9 digits."});
+            return;
+        }
+        body.phone_no = "+61"+body.phone_no;
+        // * if phone number did't exist...
         await User.findByIdAndUpdate(req.params.id, body).then(() => {
             res.status(200).json({message: "User updated Sucessfully!"});
         });       
@@ -85,7 +109,6 @@ async function updatePassword(req, res) {
                             res.json({passErr: "New password cannot be same as Old Password!"});
                             return;
                         }else{
-                            // TODO: Change Password here...
                             thisUser.password = bcrypt.hashSync(body.newPass, 10);
                             User.findByIdAndUpdate(req.params.id, thisUser).then(() => {
                                 res.status(200).json({message: "Password updated Sucessfully!"});
@@ -106,7 +129,33 @@ async function updatePassword(req, res) {
         res.status(500).json(err);
     }
 }
-
+async function verification(req, res) {
+    try {
+        let user = await User.findById(req.params.id);
+        if(user !== null){
+            if(user.otp === null){
+                res.status(200).send("<script>window.location.href='/';</script>");
+            } else if(user.status === false){
+                if (user.otp === req.params.otp) {
+                    user.status = true;
+                    user.otp = null;
+                    await User.findByIdAndUpdate(req.params.id, user).then(()=>{
+                        res.status(200).send("<title>BSW-Engineering | Verification</title><script>alert('Account Verified'); window.location.href='/';</script>");
+                    });
+                } else {
+                    res.send("<title>BSW-Engineering | ERROR 404</title><script>alert('URL Modified'); window.location.href='/';</script>");
+                }
+                
+            } else {
+                res.status(200).send("<title>BSW-Engineering | Verification</title><script>alert('Account Verified'); window.location.href='/';</script>");
+            }
+        } else{
+            res.send("<title>Error 404 | URL Modified</title><script>alert('URL Modified'); window.location.href='/';</script>");
+        }
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
 async function login(req, res, next) {
     try {
         console.log("login")
@@ -159,5 +208,6 @@ module.exports = {
     login,
     checkAuth,
     loggedIn,
-    logout
+    logout,
+    verification
 }

@@ -1,5 +1,6 @@
 const db = require("../utils/db");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 const User = db.User;
 const passport = require("passport");
 require("../utils/passportConfig")(passport);
@@ -59,8 +60,26 @@ async function createUser(req, res) {
             let hostName = `${req.protocol}://${req.headers.host}`;
             let verificationUrl = `${hostName}/api/user/userverification/${createdUser._id}/${otp}?Please_DONOT_CHANGE_THIS_URL`; 
             
-            //TODO: SEND Verification Email...
             
+            // //TODO: SEND Verification Email...
+            // let transporter = nodemailer.createTransport({
+            //     host: "smtp.hostinger.com",
+            //     port: 465,
+            //     auth: {
+            //       user: "no-reply@bswengineering.com",
+            //       pass: "P@$$w0rD",
+            //     },
+            //   });
+            //   let info = transporter.sendMail({
+            //     from: "no-reply@bswengineering.com",
+            //     to: "sales@bswengineering.com",
+            //     subject: "Hello",
+            //     text: "Hello world?",
+            //     html: "<b>Hello world?</b>",
+            //   });
+            //   console.log("Message sent: %s", info.messageId);
+            
+
             res.status(200).json({message: "User Created!", verificationUrl: verificationUrl});
         });
     }catch(err){

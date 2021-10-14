@@ -18,19 +18,19 @@ async function addToCart(req, res) {
             if(chk){
                 cart.product[index].quatity += req.body.quatity;
                 await Cart.findByIdAndUpdate(cart._id, cart).then(()=>{
-                    res.status(200).json({message: "Product Added to Cart."});
+                    res.status(200).json({msg: "Product Added to Cart."});
                 });
             } else {
                 cart.product.push(req.body);
                 await Cart.findByIdAndUpdate(cart._id, cart).then(()=>{
-                    res.status(200).json({message: "Product Added to Cart."});
+                    res.status(200).json({msg: "Product Added to Cart."});
                 });
             }
         } else {
             let cart = Cart({userId: req.params.uid});
             cart.product.push(req.body);
             await Cart.create(cart).then(()=>{
-                res.status(200).json({message: "Product Added to Cart."});
+                res.status(200).json({msg: "Product Added to Cart."});
             });
         }
     } catch (err) {
@@ -49,7 +49,7 @@ async function increment(req, res) {
         });
         cart.product[index].quatity += 1;
         await Cart.findByIdAndUpdate(cart._id, cart).then(()=>{
-            res.status(200).json({message: "Quantity increased"});
+            res.status(200).json({msg: "Quantity increased"});
         });
     } catch (err) {
         res.status(500).json(err);
@@ -69,7 +69,7 @@ async function decrement(req, res) {
             cart.product.splice(index, 1);
         }
         await Cart.findByIdAndUpdate(cart._id, cart).then(()=>{
-            res.status(200).json({message: "Quantity decreased"});
+            res.status(200).json({msg: "Quantity decreased"});
         });
         
     } catch (err) {
@@ -99,7 +99,7 @@ async function removeFromCart(req, res) {
             cart.product.splice(index, 1);
         }
         await Cart.findByIdAndUpdate(cart._id, cart).then(()=>{
-            res.status(200).json({message: "Product Deleted from Cart."});
+            res.status(200).json({msg: "Product Deleted from Cart."});
         });
 
     } catch (err) {

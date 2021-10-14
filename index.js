@@ -41,7 +41,10 @@ app.use("/api/category", require("./routes/category"));
 app.use("/api/product", require("./routes/product"));
 app.use("/api/cart", require("./routes/cart"));
 app.use("/api/slider", require("./routes/slider"));
+
+//! Static Image and Slider folders
 app.use("/uploads/images", express.static("./uploads/images"));
+app.use("/uploads/sliders", express.static("./uploads/sliders"));
 
 //? Test Route
 app.use("/", (req, res)=>{

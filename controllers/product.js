@@ -19,7 +19,7 @@ async function addProduct(req, res) {
       req.body = { ...req.body, image: req.file.path };
     }
     await Product.create(req.body).then(() => {
-      res.status(200).json({ message: "Product created sucessfully!" });
+      res.status(200).json({ msg: "Product created sucessfully!" });
     });
   } catch (err) {
     res.status(500).json(err);
@@ -29,7 +29,7 @@ async function addProduct(req, res) {
 async function updateProduct(req, res) {
   try {
     await Product.findByIdAndUpdate(req.params.id, req.body).then(() => {
-      res.status(200).json({message:"Product Updated Sucessfully!"});
+      res.status(200).json({msg:"Product Updated Sucessfully!"});
     });
   } catch (err) {
     res.status(200).json(err);
@@ -41,7 +41,7 @@ async function deleteProduct(req, res) {
     let product = await Product.findById(req.params.id);
     product.status = false;
     await Product.findByIdAndUpdate(req.params.id, product).then(()=>{
-      res.status(200).json({message: "Product Deleted"});
+      res.status(200).json({msg: "Product Deleted"});
     });
   } catch (err) {
     res.status(200).json(err);
@@ -69,12 +69,12 @@ async function addStock(req, res) {
   try {
     let product = await Product.findById(req.params.id);
     if(req.body.stock < 1){
-      res.status(500).json({message: "Stock cannot be less than 1"});
+      res.status(500).json({msg: "Stock cannot be less than 1"});
       return;
     }
     product.stock += req.body.stock;
     await Product.findByIdAndUpdate(req.params.id, product).then(()=>{
-      res.status(200).json({message: "Stock Added Sucessfully!"});
+      res.status(200).json({msg: "Stock Added Sucessfully!"});
     });
   } catch (err) {
     res.status(500).json(err);

@@ -10,6 +10,8 @@ const {
     deleteProduct,
     addStock,
     searchProducts,
+    featureProduct,
+    getFeaturedProducts,
 } = require("../controllers/product");
 
 const storage = multer.diskStorage({
@@ -23,11 +25,13 @@ const storage = multer.diskStorage({
 const uploadImage = multer({storage: storage});
 
 router.get("/", getAllProducts);
-router.get("/search", searchProducts);
 router.post("/create", uploadImage.single("image"), addProduct);
+router.get("/search", searchProducts);
+router.get("/featured", getFeaturedProducts);
 router.get("/:id", getProductByID);
 router.put("/:id/update", uploadImage.single("image"), updateProduct);
 router.put("/:id/delete", deleteProduct);
 router.put("/:id/addstock", addStock);
+router.put("/:id/feature", featureProduct);
 
 module.exports = router;

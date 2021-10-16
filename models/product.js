@@ -5,6 +5,10 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true,
     },
+    description: {
+        type: String,
+        required: true,
+    },
     image: {
         type: String,
         default: "Uploads\\images\\default.jpg",
@@ -21,9 +25,9 @@ const productSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "subCategory",
     },
-    description: {
-        type: String,
-        required: true,
+    featured: {
+        type: Boolean,
+        default: false,
     },
     status: {
         type: Boolean,

@@ -3,7 +3,7 @@ const Product = db.Product;
 
 async function getAllProducts(req, res) {
   try {
-    let products = await Product.find({status: true}).populate(
+    let products = await Product.find({ status: true }).populate(
       "categoryId",
       "name parentCategory"
     );
@@ -29,7 +29,7 @@ async function addProduct(req, res) {
 async function updateProduct(req, res) {
   try {
     await Product.findByIdAndUpdate(req.params.id, req.body).then(() => {
-      res.status(200).json({msg:"Product Updated Sucessfully!"});
+      res.status(200).json({ msg: "Product Updated Sucessfully!" });
     });
   } catch (err) {
     res.status(200).json(err);
@@ -40,8 +40,8 @@ async function deleteProduct(req, res) {
   try {
     let product = await Product.findById(req.params.id);
     product.status = false;
-    await Product.findByIdAndUpdate(req.params.id, product).then(()=>{
-      res.status(200).json({msg: "Product Deleted"});
+    await Product.findByIdAndUpdate(req.params.id, product).then(() => {
+      res.status(200).json({ msg: "Product Deleted" });
     });
   } catch (err) {
     res.status(200).json(err);
@@ -55,12 +55,18 @@ async function getProductByID(req, res) {
     //? Getting 8 Related Products
     let relatedProducts = await Product.aggregate([
       {
-        $match: { categoryId: product.categoryId, _id: { $ne: req.params.id }, status: true},
+        $match: {
+          categoryId: product.categoryId,
+          _id: { $ne: req.params.id },
+          status: true,
+        },
       },
       { $sample: { size: 8 } },
     ]);
 
-    res.status(200).json({ product: product, relatedsProducts: relatedProducts });
+    res
+      .status(200)
+      .json({ product: product, relatedsProducts: relatedProducts });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -68,13 +74,13 @@ async function getProductByID(req, res) {
 async function addStock(req, res) {
   try {
     let product = await Product.findById(req.params.id);
-    if(req.body.stock < 1){
-      res.status(500).json({msg: "Stock cannot be less than 1"});
+    if (req.body.stock < 1) {
+      res.status(500).json({ msg: "Stock cannot be less than 1" });
       return;
     }
     product.stock += req.body.stock;
-    await Product.findByIdAndUpdate(req.params.id, product).then(()=>{
-      res.status(200).json({msg: "Stock Added Sucessfully!"});
+    await Product.findByIdAndUpdate(req.params.id, product).then(() => {
+      res.status(200).json({ msg: "Stock Added Sucessfully!" });
     });
   } catch (err) {
     res.status(500).json(err);
@@ -83,11 +89,14 @@ async function addStock(req, res) {
 
 async function searchProducts(req, res) {
   try {
-    if(req.query.q !== ""){
-      const regex = new RegExp(req.query.q, 'i');
-      let results = await Product.find({name : { $regex : regex}, status : true});
+    if (req.query.q !== "") {
+      const regex = new RegExp(req.query.q, "i");
+      let results = await Product.find({
+        name: { $regex: regex },
+        status: true,
+      });
       res.status(200).json(results);
-    }else{
+    } else {
       // let results = await Product.find({status : true});
       // res.status(200).json(results);
       res.status(200).json();
@@ -96,7 +105,34 @@ async function searchProducts(req, res) {
     res.status(500).json(err);
   }
 }
-
+async function featureProduct(req, res) {
+  try {
+    let singleProduct = await Product.findById(req.params.id);
+    singleProduct.featured = !singleProduct.featured;
+    await Product.findByIdAndUpdate(req.params.id, singleProduct).then(() => {
+      if (singleProduct.featured) {
+        res.status(200).json({ msg: "Product Added to Featured Products!" });
+      } else {
+        res
+          .status(200)
+          .json({ msg: "Product Removed from Featured Products!" });
+      }
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+async function getFeaturedProducts(req, res) {
+  try {
+    let featuredProducts = await Product.aggregate([
+      { $match: { featured: true, status: true } },
+      { $sample: { size: 8 } },
+    ]);
+    res.status(200).json(featuredProducts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
 module.exports = {
   getAllProducts,
   addProduct,
@@ -104,5 +140,7 @@ module.exports = {
   updateProduct,
   deleteProduct,
   addStock,
-  searchProducts
+  searchProducts,
+  featureProduct,
+  getFeaturedProducts,
 };

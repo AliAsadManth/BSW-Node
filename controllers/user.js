@@ -30,25 +30,25 @@ async function createUser(req, res) {
   try {
     let email = await User.countDocuments({ email: body.email });
     if (email !== 0) {
-      res.json({ emailErr: "Email Already exist" });
+      res.json({ err: "Email Already exist" });
       return;
     }
     let phone = await User.countDocuments({ phone_no: "+61" + body.phone_no });
     if (body.phone_no.length !== 9) {
       res.json({
-        phoneErr: "Wrong Phone Number Format, Phone number must be 9 digits.",
+        err: "Wrong Phone Number Format, Phone number must be 9 digits.",
       });
       return;
     }
     if (phone !== 0) {
-      res.json({ phoneErr: "Phone Number Already exist" });
+      res.json({ err: "Phone Number Already exist" });
       return;
     }
     let userObj = new User(body);
 
     if (body.password.length < 8) {
       res.json({
-        passErr: "Password must be greater or equal to 8 characters",
+        err: "Password must be greater or equal to 8 characters",
       });
       return;
     }
@@ -68,8 +68,8 @@ async function createUser(req, res) {
       var transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: "cafeperks.falcon@gmail.com",
-          pass: "cafeperks123",
+          user: "bsw.manth@gmail.com",
+          pass: "bswengr123",
         },
       });
       transporter.sendMail(
@@ -77,12 +77,12 @@ async function createUser(req, res) {
           from: "cafeperks.falcon@gmail.com",
           to: req.body.email,
           subject: "Hello",
-          html: "<b>Hello world?</b>Najam ki maa ki chut",
+          html: "<b>Hello world?</b>",
         },
         function (err, info) {
           if (err) {
-            console.log(err);
-            res.status(500).json({ msg: "Something Went Wrong" });
+            console.log(err.message);
+            res.status(500).json({ err: err.message });
           } else {
             res.status(200).json({
               msg: "User Created!",

@@ -12,7 +12,8 @@ const {
     checkAuth,
     loggedIn,
     logout,
-    verification
+    verification,
+    forgetPassword
 } = require("../controllers/user");
 
 //TODO: User Routes
@@ -20,6 +21,7 @@ router.get("/", getAllUsers);
 router.get("/:id", getUserById);
 router.post("/create", createUser);
 router.put("/update/:id", updateUser);
+router.put("/forgetpassword", forgetPassword);
 router.put("/update/password/:id", updatePassword);
 router.get("/userverification/:id/:otp", verification);
 router.post("/login", login);

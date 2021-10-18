@@ -43,7 +43,7 @@ async function createUser(req, res) {
     if (phone !== 0) {
       res.json({ err: "Phone Number Already exist" });
       return;
-    }
+    } 
     let userObj = new User(body);
 
     if (body.password.length < 8) {
@@ -64,7 +64,6 @@ async function createUser(req, res) {
       let hostName = `${req.protocol}://${req.headers.host}`;
       let verificationUrl = `${hostName}/api/user/userverification/${createdUser._id}/${otp}?via_email=true`;
 
-      //TODO: SEND Verification Email...
       var transporter = nodemailer.createTransport({
         service: "gmail",
         port: "465",
@@ -112,7 +111,7 @@ async function createUser(req, res) {
                           </tr>
                           <tr>
                               <td align="center" style="padding: 20px 10px 20px 10px;background: rgba(148, 148, 148, 0.164);">
-                                  <h3 style="font-family: Monospace; font-size: ">
+                                  <h3 style="font-family: Monospace; font-size:  25px;">
                                       Continue signing up for BSW-Engineerings by clicking the button below:
                                   </h3>
                                   <a href="${verificationUrl}" style="${btnStyle}">Confirm Email</a>
@@ -128,7 +127,7 @@ async function createUser(req, res) {
                               </td>
                           </tr>
                           <tr>
-                              <td style="padding: 10px 0 0 10px; background: #ee4c50">
+                              <td style="padding: 10px 10px 10px 10px; background: #ee4c50">
                                   <p style="color: white; font-family: Helvetica;">Address: 21 Darlot road, Landsdale, WA 6065</p>
                                   <p style="color: white; font-family: Helvetica;">
                                       Call: 
@@ -139,18 +138,23 @@ async function createUser(req, res) {
                                   </p>
                               </td>
                           </tr>
+                          <tr>
+                          <td>
+                            <p align="center" style="color: #6b6b6b; font-family: Helvetica;">This email is generated automatically please do not reply.</p>
+                          </td>
+                        </tr>
                       </table>
                   </td>
               </tr>
           </table>
       </body>
-
       `;
       transporter.sendMail(
         {
           from: "bsw.manth@gmail.com",
           to: req.body.email,
           subject: "Confirm Your Email address",
+          text: "This email is generated automatically please do not reply",
           html: html,
         },
         function (err, info) {
@@ -235,6 +239,122 @@ async function updatePassword(req, res) {
         res.json({ passErr: "Password didn't match!" });
         return;
       }
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+async function forgetPassword(req, res) {
+  try {
+    let userObj = await User.findOne({email: req.body.email});
+    if(userObj === null){
+      res.status(404).json({err: "User not found!"});
+      return;
+    }
+    var chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let password = "";
+    for (var i = 0; i <= 8; i++) {
+      var randomNumber = Math.floor(Math.random() * chars.length);
+      password += chars.substring(randomNumber, randomNumber + 1);
+    }
+    const html = `
+    <body style="margin: 0; padding: 0">
+      <table role="presentation" style="
+                width: 100%;
+                border-collapse: collapse;
+                border: 0;
+                border-spacing: 0;
+                background: #ffffff;
+              ">
+          <tr>
+              <td align="center" style="padding: 0">
+                  <table role="presentation" style="
+                      width: 602px;
+                      border-collapse: collapse;
+                      border: 1px solid #cccccc;
+                      border-spacing: 0;
+                      text-align: left;
+                    ">
+                      <tr>
+                          <td align="center" style="padding: 20px 5px 10px 5px; background: rgb(255, 255, 255)">
+                              <img src="https://icon-library.com/images/reset-password-icon/reset-password-icon-29.jpg" alt="" width="150"
+                                  style="height: auto; display: block" />
+                              <h2 style="font-family: Gadugi">Hi ${userObj.name}.</h2>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td align="center" style="padding: 20px 10px 20px 10px;background: rgba(184, 183, 183, 0.651);">
+                              <h3 style="font-family: Monospace; font-size: 25px;">
+                                  Your new Password is below:
+                              </h3>
+                              <p style="font-family: monospace;
+                              font-weight: bold;
+                              background-color: rgb(255, 255, 255);
+                              border: none;
+                              color: rgb(0, 0, 0);
+                              padding: 15px 32px;
+                              text-align: center;
+                              text-decoration: none;
+                              display: inline-block;
+                              font-size: 20px;">${password}</p>
+                              <h3 style="font-family: Monospace; font-size: 15px;">
+                                  You can use this password to log into your account.
+                              </h3>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 10px 10px 10px 10px; background: #ee4c50">
+                              <p style="color: white; font-family: Helvetica;">Address: 21 Darlot road, Landsdale, WA 6065</p>
+                              <p style="color: white; font-family: Helvetica;">
+                                  Call: 
+                                  <a style="color: white; font-family: Helvetica;" href="tel:+610862050609">+61 (08) 62050609</a>
+                              </p>
+                              <p style="color: white; font-family: Helvetica;">Email:
+                                  <a style="color: white; font-family: Helvetica;" href="mailto:sales@bswengineering.com">sales@bswengineering.com</a>
+                              </p>
+                          </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <p align="center" style="color: #6b6b6b; font-family: Helvetica;">This email is generated automatically please do not reply.</p>
+                        </td>
+                      </tr>
+                  </table>
+              </td>
+          </tr>
+      </table>
+  </body>
+    `;
+    userObj.password = bcrypt.hashSync(password, 10);
+    
+    User.findByIdAndUpdate(userObj._id, userObj).then(()=>{
+      var transporter = nodemailer.createTransport({
+        service: "gmail",
+        port: "465",
+        secure: true,
+        auth: {
+          user: "bsw.manth@gmail.com",
+          pass: "bswengr123",
+        },
+      });
+      transporter.sendMail(
+        {
+          from: "bsw.manth@gmail.com",
+          to: userObj.email,
+          subject: "Password Reset Email",
+          html: html,
+        },
+        function (err, info) {
+          if (err) {
+            console.log(err.message);
+            res.status(500).json({ err: err.message });
+          } else {
+            res.status(200).json({
+              msg: "Password Update Email sent.",
+            });
+          }
+        }
+      );
     });
   } catch (err) {
     res.status(500).json(err);
@@ -332,4 +452,5 @@ module.exports = {
   loggedIn,
   logout,
   verification,
+  forgetPassword,
 };

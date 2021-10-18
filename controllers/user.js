@@ -62,22 +62,96 @@ async function createUser(req, res) {
 
     await User.create(userObj).then((createdUser) => {
       let hostName = `${req.protocol}://${req.headers.host}`;
-      let verificationUrl = `${hostName}/api/user/userverification/${createdUser._id}/${otp}?Please_DONOT_CHANGE_THIS_URL`;
+      let verificationUrl = `${hostName}/api/user/userverification/${createdUser._id}/${otp}?via_email=true`;
 
       //TODO: SEND Verification Email...
       var transporter = nodemailer.createTransport({
         service: "gmail",
+        port: "465",
+        secure: true,
         auth: {
           user: "bsw.manth@gmail.com",
           pass: "bswengr123",
         },
       });
+      const btnStyle = `
+      font-family: Helvetica;
+      border-radius: 8px;
+      background-color: tomato;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;`;
+      const html = `
+      <body style="margin: 0; padding: 0">
+          <table role="presentation" style="
+                    width: 100%;
+                    border-collapse: collapse;
+                    border: 0;
+                    border-spacing: 0;
+                    background: #ffffff;
+                  ">
+              <tr>
+                  <td align="center" style="padding: 0">
+                      <table role="presentation" style="
+                          width: 602px;
+                          border-collapse: collapse;
+                          border: 1px solid #cccccc;
+                          border-spacing: 0;
+                          text-align: left;
+                        ">
+                          <tr>
+                              <td align="center" style="padding: 20px 5px 10px 5px; background: rgb(255, 255, 255)">
+                                  <img src="https://i.dlpng.com/static/png/6748900_preview.png" alt="" width="150"
+                                      style="height: auto; display: block" />
+                                  <h2 style="font-family: Gadugi">Hi ${userObj.name}, Welcome to BSW-Engineerings</h2>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td align="center" style="padding: 20px 10px 20px 10px;background: rgba(148, 148, 148, 0.164);">
+                                  <h3 style="font-family: Monospace; font-size: ">
+                                      Continue signing up for BSW-Engineerings by clicking the button below:
+                                  </h3>
+                                  <a href="${verificationUrl}" style="${btnStyle}">Confirm Email</a>
+                              </td>
+                          </tr>
+                          <tr align="center" style="padding: 20px 10px 20px 10px;">
+                              <td>
+                                  <div style="padding-top: 10px;">
+                                      <p style="font-family: Helvetica;">Not able to enter the code? Paste the following link
+                                          into your browser:</p>
+                                      <p style="color: rgb(0, 47, 255); font-family: Helvetica;">${verificationUrl}</p>
+                                  </div>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td style="padding: 10px 0 0 10px; background: #ee4c50">
+                                  <p style="color: white; font-family: Helvetica;">Address: 21 Darlot road, Landsdale, WA 6065</p>
+                                  <p style="color: white; font-family: Helvetica;">
+                                      Call: 
+                                      <a style="color: white; font-family: Helvetica;" href="tel:+610862050609">+61 (08) 62050609</a>
+                                  </p>
+                                  <p style="color: white; font-family: Helvetica;">Email:
+                                      <a style="color: white; font-family: Helvetica;" href="mailto:sales@bswengineering.com">sales@bswengineering.com</a>
+                                  </p>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
+      </body>
+
+      `;
       transporter.sendMail(
         {
-          from: "cafeperks.falcon@gmail.com",
+          from: "bsw.manth@gmail.com",
           to: req.body.email,
-          subject: "Hello",
-          html: "<b>Hello world?</b>",
+          subject: "Confirm Your Email address",
+          html: html,
         },
         function (err, info) {
           if (err) {
@@ -86,7 +160,6 @@ async function createUser(req, res) {
           } else {
             res.status(200).json({
               msg: "User Created!",
-              verificationUrl: verificationUrl,
             });
           }
         }

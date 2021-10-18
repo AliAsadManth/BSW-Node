@@ -39,6 +39,14 @@ async function updateCategory(req, res) {
         res.status(500).json(err);
     }
 }
+async function getCategoryById(req, res) {
+    try {
+        let categories = await Category.find({parentCategory: req.params.id});
+        res.status(200).json(categories);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
 
 //? Sub Category Methods
 async function getAllSubCategory(req, res) {
@@ -72,15 +80,24 @@ async function updateSubCategory(req, res) {
         res.status(500).json(err);
     }
 }
-
+async function getSubcategoryById(req, res) {
+    try {
+        let subcategories = await SubCategory.find({parentCategory: req.params.id}).populate("parentCategory", "name");
+        res.status(200).json(subcategories);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
 module.exports = {
     getAllCategory,
     createCategory,
     deleteCategory,
     updateCategory,
+    getCategoryById,
 
     createSubCategory,
     getAllSubCategory,
     deleteSubCategory,
     updateSubCategory,
+    getSubcategoryById,
 }

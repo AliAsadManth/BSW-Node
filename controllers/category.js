@@ -10,7 +10,7 @@ async function getAllCategory(req, res) {
 async function createCategory(req, res) {
     try {
         if(req.body.parentCategory === undefined){
-            res.status(500).json({msg: 'Please Select Category'});
+            res.status(200).json({msg: 'Please Select Category'});
             return;
         }
         await Category.create(req.body).then(()=>{
@@ -60,7 +60,7 @@ async function getAllSubCategory(req, res) {
 async function createSubCategory(req, res) {
     try {
         if(req.body.parentCategory === undefined){
-            res.status(500).json({msg: 'Please Select Category'});
+            res.status(200).json({msg: 'Please Select Category'});
             return;
         }
         await SubCategory.create(req.body).then(()=>{

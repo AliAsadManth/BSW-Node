@@ -75,7 +75,7 @@ async function addStock(req, res) {
   try {
     let product = await Product.findById(req.params.id);
     if (req.body.stock < 1) {
-      res.status(500).json({ msg: "Stock cannot be less than 1" });
+      res.json({ msg: "Stock cannot be less than 1" });
       return;
     }
     product.stock += req.body.stock;

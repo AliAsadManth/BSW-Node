@@ -17,7 +17,7 @@ async function createSlider(req, res) {
         res.status(200).json({ msg: "Slider Uploaded sucessfully!" });
       });
     } else {
-      res.status(500).json("Please Attach Image!");
+      res.json({msg: "Please Attach Image!"});
     }
   } catch (err) {
     res.status(500).json(err);
@@ -32,7 +32,7 @@ async function deleteSlider(req, res) {
     await Slider.findByIdAndDelete(req.params.id).then(() => {
       fs.unlink(path, (err) => {
         if (err) {
-          res.status(500).json(err);
+          res.json(err);
           return;
         } else {
           res.status(200).json({ msg: "Slider Deleted!" });

@@ -159,7 +159,7 @@ async function createUser(req, res) {
 				},
 				function (err, info) {
 					if (err) {
-						res.status(500).json({ err: err.message });
+						res.json({ err: err.message });
 					} else {
 						res.status(200).json({
 							msg: "User Created!",
@@ -347,7 +347,7 @@ async function forgetPassword(req, res) {
 				function (err, info) {
 					if (err) {
 						console.log(err.message);
-						res.status(500).json({ err: err.message });
+						res.json({ err: err.message });
 					} else {
 						res.status(200).json({
 							msg: "Password Update Email sent.",

@@ -69,8 +69,8 @@ async function createUser(req, res) {
 				port: "465",
 				secure: true,
 				auth: {
-					user: "bsw.manth@gmail.com",
-					pass: "bswengr123",
+					user: process.env.EMAIL,
+					pass: process.env.EMAIL_PASS,
 				},
 			});
 			const btnStyle = `
@@ -151,7 +151,7 @@ async function createUser(req, res) {
       `;
 			transporter.sendMail(
 				{
-					from: "bsw.manth@gmail.com",
+					from: process.env.EMAIL,
 					to: req.body.email,
 					subject: "Confirm Your Email address",
 					text: "This email is generated automatically please do not reply",
@@ -333,13 +333,13 @@ async function forgetPassword(req, res) {
 				port: "465",
 				secure: true,
 				auth: {
-					user: "bsw.manth@gmail.com",
-					pass: "bswengr123",
+					user: process.env.EMAIL,
+					pass: process.env.EMAIL_PASS,
 				},
 			});
 			transporter.sendMail(
 				{
-					from: "bsw.manth@gmail.com",
+					from: process.env.EMAIL,
 					to: userObj.email,
 					subject: "Password Reset Email",
 					html: html,
@@ -374,24 +374,24 @@ async function verification(req, res) {
 						res
 							.status(200)
 							.send(
-								"<title>BSW-Engineering | Verification</title><script>alert('Account Verified'); window.location.href='/';</script>",
+								`<title>BSW-Engineering | Verification</title><script>alert('Account Verified'); window.location.href='${process.env.RETURN_URL}';</script>`,
 							);
 					});
 				} else {
 					res.send(
-						"<title>BSW-Engineering | ERROR 404</title><script>alert('URL Modified'); window.location.href='/';</script>",
+						`<title>BSW-Engineering | ERROR 404</title><script>alert('URL Modified'); window.location.href='${process.env.RETURN_URL}';</script>`,
 					);
 				}
 			} else {
 				res
 					.status(200)
 					.send(
-						"<title>BSW-Engineering | Verification</title><script>alert('Account Verified'); window.location.href='/';</script>",
+						`<title>BSW-Engineering | Verification</title><script>alert('Account Verified'); window.location.href='${process.env.RETURN_URL}';</script>`,
 					);
 			}
 		} else {
 			res.send(
-				"<title>Error 404 | URL Modified</title><script>alert('URL Modified'); window.location.href='/';</script>",
+				`<title>Error 404 | URL Modified</title><script>alert('URL Modified'); window.location.href='${process.env.RETURN_URL}';</script>`,
 			);
 		}
 	} catch (err) {

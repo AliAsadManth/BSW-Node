@@ -1,6 +1,7 @@
 const db = require("../utils/db");
 const Category = db.Category;
 const SubCategory = db.SubCategory;
+const Product = db.Product;
 
 //? Category Methods
 async function getAllCategory(req, res) {

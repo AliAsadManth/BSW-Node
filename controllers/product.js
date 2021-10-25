@@ -133,6 +133,14 @@ async function getFeaturedProducts(req, res) {
     res.status(500).json(err);
   }
 }
+async function getLatestProducts(req, res) {
+  try {
+    let latestProducts = await Product.find().sort({'_id': -1}).limit(8);
+    res.json(latestProducts);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
 module.exports = {
   getAllProducts,
   addProduct,
@@ -143,4 +151,5 @@ module.exports = {
   searchProducts,
   featureProduct,
   getFeaturedProducts,
+  getLatestProducts,
 };

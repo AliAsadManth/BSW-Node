@@ -3,7 +3,7 @@ const Product = db.Product;
 
 async function getAllProducts(req, res) {
   try {
-    let products = await Product.find({ status: true }).populate(
+    let products = await Product.find().populate(
       "categoryId",
       "name parentCategory"
     );
@@ -108,6 +108,11 @@ async function searchProducts(req, res) {
 async function featureProduct(req, res) {
   try {
     let singleProduct = await Product.findById(req.params.id);
+    let docCount = await Product.countDocuments({ featured: true });
+    if (docCount === 8 && singleProduct.featured === false) {
+      res.json({ msg: "Only 8 Products can be featured" });
+      return;
+    }
     singleProduct.featured = !singleProduct.featured;
     await Product.findByIdAndUpdate(req.params.id, singleProduct).then(() => {
       if (singleProduct.featured) {
@@ -126,7 +131,7 @@ async function getFeaturedProducts(req, res) {
   try {
     let featuredProducts = await Product.aggregate([
       { $match: { featured: true, status: true } },
-      { $sample: { size: 8 } },
+      // { $sample: { size: 8 } },
     ]);
     res.status(200).json(featuredProducts);
   } catch (err) {
@@ -135,7 +140,7 @@ async function getFeaturedProducts(req, res) {
 }
 async function getLatestProducts(req, res) {
   try {
-    let latestProducts = await Product.find().sort({'_id': -1}).limit(8);
+    let latestProducts = await Product.find().sort({ _id: -1 }).limit(8);
     res.json(latestProducts);
   } catch (err) {
     res.status(500).json(err);

@@ -9,6 +9,14 @@ async function getSliders(req, res) {
     res.status(500).json(err);
   }
 }
+async function getActiveSliders(req, res) {
+  try {
+    let sliders = await Slider.find({active: true});
+    res.json(sliders);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
 async function createSlider(req, res) {
   try {
     if (req.file) {
@@ -61,6 +69,7 @@ async function updateSlider(req, res) {
 }
 module.exports = {
   getSliders,
+  getActiveSliders,
   createSlider,
   deleteSlider,
   updateSlider,

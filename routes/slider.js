@@ -7,6 +7,7 @@ const {
     createSlider,
     deleteSlider,
     updateSlider,
+    getActiveSliders
 } = require("../controllers/slider");
 
 const storage = multer.diskStorage({
@@ -20,6 +21,8 @@ const storage = multer.diskStorage({
 const uploadSlider = multer({storage: storage});
 
 router.get("/", getSliders);
+router.get("/active", getActiveSliders);
+
 router.post("/create", uploadSlider.single("image"), createSlider);
 router.delete("/delete/:id", deleteSlider);
 router.put("/update/:id", updateSlider);

@@ -13,10 +13,12 @@ const {
 	logout,
 	verification,
 	forgetPassword,
+	contactUs,
 } = require("../controllers/user");
 
 //TODO: User Routes
 router.get("/", getAllUsers);
+router.get("/contact", contactUs);
 router.get("/:id", getUserById);
 router.post("/create", createUser);
 router.put("/update/:id", updateUser);

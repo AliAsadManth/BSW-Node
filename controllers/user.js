@@ -34,12 +34,12 @@ async function createUser(req, res) {
 			return;
 		}
 		let phone = await User.countDocuments({ phone_no: "+61" + body.phone_no });
-		if (body.phone_no.length !== 9) {
-			res.json({
-				err: "Wrong Phone Number Format, Phone number must be 9 digits.",
-			});
-			return;
-		}
+		// if (body.phone_no.length !== 9) {
+		// 	res.json({
+		// 		err: "Wrong Phone Number Format, Phone number must be 9 digits.",
+		// 	});
+		// 	return;
+		// }
 		if (phone !== 0) {
 			res.json({ err: "Phone Number Already exist" });
 			return;
@@ -74,81 +74,81 @@ async function createUser(req, res) {
 				},
 			});
 			const btnStyle = `
-      font-family: Helvetica;
-      border-radius: 8px;
-      background-color: tomato;
-      border: none;
-      color: white;
-      padding: 15px 32px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;`;
+				font-family: Helvetica;
+				border-radius: 8px;
+				background-color: tomato;
+				border: none;
+				color: white;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 16px;`;
 			const html = `
-      <body style="margin: 0; padding: 0">
-          <table role="presentation" style="
-                    width: 100%;
-                    border-collapse: collapse;
-                    border: 0;
-                    border-spacing: 0;
-                    background: #ffffff;
-                  ">
-              <tr>
-                  <td align="center" style="padding: 0">
-                      <table role="presentation" style="
-                          width: 602px;
-                          border-collapse: collapse;
-                          border: 1px solid #cccccc;
-                          border-spacing: 0;
-                          text-align: left;
-                        ">
-                          <tr>
-                              <td align="center" style="padding: 20px 5px 10px 5px; background: rgb(255, 255, 255)">
-                                  <img src="https://i.dlpng.com/static/png/6748900_preview.png" alt="" width="150"
-                                      style="height: auto; display: block" />
-                                  <h2 style="font-family: Gadugi">Hi ${userObj.name}, Welcome to BSW-Engineerings</h2>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td align="center" style="padding: 20px 10px 20px 10px;background: rgba(148, 148, 148, 0.164);">
-                                  <h3 style="font-family: Monospace; font-size:  25px;">
-                                      Continue signing up for BSW-Engineerings by clicking the button below:
-                                  </h3>
-                                  <a href="${verificationUrl}" style="${btnStyle}">Confirm Email</a>
-                              </td>
-                          </tr>
-                          <tr align="center" style="padding: 20px 10px 20px 10px;">
-                              <td>
-                                  <div style="padding-top: 10px;">
-                                      <p style="font-family: Helvetica;">Not able to enter the code? Paste the following link
-                                          into your browser:</p>
-                                      <p style="color: rgb(0, 47, 255); font-family: Helvetica;">${verificationUrl}</p>
-                                  </div>
-                              </td>
-                          </tr>
-                          <tr>
-                              <td style="padding: 10px 10px 10px 10px; background: #ee4c50">
-                                  <p style="color: white; font-family: Helvetica;">Address: 21 Darlot road, Landsdale, WA 6065</p>
-                                  <p style="color: white; font-family: Helvetica;">
-                                      Call: 
-                                      <a style="color: white; font-family: Helvetica;" href="tel:+610862050609">+61 (08) 62050609</a>
-                                  </p>
-                                  <p style="color: white; font-family: Helvetica;">Email:
-                                      <a style="color: white; font-family: Helvetica;" href="mailto:sales@bswengineering.com">sales@bswengineering.com</a>
-                                  </p>
-                              </td>
-                          </tr>
-                          <tr>
-                          <td>
-                            <p align="center" style="color: #6b6b6b; font-family: Helvetica;">This email is generated automatically please do not reply.</p>
-                          </td>
-                        </tr>
-                      </table>
-                  </td>
-              </tr>
-          </table>
-      </body>
-      `;
+				<body style="margin: 0; padding: 0">
+					<table role="presentation" style="
+								width: 100%;
+								border-collapse: collapse;
+								border: 0;
+								border-spacing: 0;
+								background: #ffffff;
+							">
+						<tr>
+							<td align="center" style="padding: 0">
+								<table role="presentation" style="
+									width: 602px;
+									border-collapse: collapse;
+									border: 1px solid #cccccc;
+									border-spacing: 0;
+									text-align: left;
+									">
+									<tr>
+										<td align="center" style="padding: 20px 5px 10px 5px; background: rgb(255, 255, 255)">
+											<img src="https://i.dlpng.com/static/png/6748900_preview.png" alt="" width="150"
+												style="height: auto; display: block" />
+											<h2 style="font-family: Gadugi">Hi ${userObj.name}, Welcome to BSW-Engineerings</h2>
+										</td>
+									</tr>
+									<tr>
+										<td align="center" style="padding: 20px 10px 20px 10px;background: rgba(148, 148, 148, 0.164);">
+											<h3 style="font-family: Monospace; font-size:  25px;">
+												Continue signing up for BSW-Engineerings by clicking the button below:
+											</h3>
+											<a href="${verificationUrl}" style="${btnStyle}">Confirm Email</a>
+										</td>
+									</tr>
+									<tr align="center" style="padding: 20px 10px 20px 10px;">
+										<td>
+											<div style="padding-top: 10px;">
+												<p style="font-family: Helvetica;">Not able to enter the code? Paste the following link
+													into your browser:</p>
+												<p style="color: rgb(0, 47, 255); font-family: Helvetica;">${verificationUrl}</p>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td style="padding: 10px 10px 10px 10px; background: #ee4c50">
+											<p style="color: white; font-family: Helvetica;">Address: 21 Darlot road, Landsdale, WA 6065</p>
+											<p style="color: white; font-family: Helvetica;">
+												Call: 
+												<a style="color: white; font-family: Helvetica;" href="tel:+610862050609">+61 (08) 62050609</a>
+											</p>
+											<p style="color: white; font-family: Helvetica;">Email:
+												<a style="color: white; font-family: Helvetica;" href="mailto:sales@bswengineering.com">sales@bswengineering.com</a>
+											</p>
+										</td>
+									</tr>
+									<tr>
+									<td>
+										<p align="center" style="color: #6b6b6b; font-family: Helvetica;">This email is generated automatically please do not reply.</p>
+									</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</body>
+				`;
 			transporter.sendMail(
 				{
 					from: process.env.EMAIL,
@@ -398,6 +398,39 @@ async function verification(req, res) {
 		res.status(500).json(err);
 	}
 }
+async function contactUs(req, res) {
+	try {
+		var transporter = nodemailer.createTransport({
+			service: "gmail",
+			port: "465",
+			secure: true,
+			auth: {
+				user: process.env.EMAIL,
+				pass: process.env.EMAIL_PASS,
+			},
+		});
+		transporter.sendMail(
+			{
+				from: process.env.EMAIL,
+				to: process.env.CONTACT_EMAIL,
+				subject: `Message from ${req.body.name}`,
+				text: `From: ${req.body.email}\nMessage: ${req.body.msg}`,
+			},
+			function (err, info) {
+				if (err) {
+					console.log(err.message);
+					res.json({ err: err.message });
+				} else {
+					res.status(200).json({
+						msg: "Your message has been sent.",
+					});
+				}
+			},
+		);
+	} catch (err) {
+		res.status(500).json(err);
+	}
+}
 async function login(req, res, next) {
 	try {
 		passport.authenticate("local", (err, user) => {
@@ -416,7 +449,6 @@ async function login(req, res, next) {
 		res.status(500).json(err);
 	}
 }
-
 async function loggedIn(req, res) {
 	res.json({ status: 200, user: req.user });
 }
@@ -441,4 +473,5 @@ module.exports = {
 	logout,
 	verification,
 	forgetPassword,
+	contactUs,
 };

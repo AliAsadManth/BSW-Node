@@ -15,15 +15,14 @@ async function getAllProducts(req, res) {
 
 async function addProduct(req, res) {
   try {
-    if(req.files){
-      let path = '';
-      req.files.forEach((files, index, arr) => {
-        path = path + files.path + ',';
+    if (req.files) {
+      const filePaths = [];
+      req.files.forEach((element) => {
+        filePaths.push(element.path);
       });
-      path = path.substring(0, path.lastIndexOf(','));
-      req.body = { ...req.body, image: path};
+      req.body = { ...req.body, image: filePaths };
     }
-    
+
     await Product.create(req.body).then(() => {
       res.status(200).json({ msg: "Product created sucessfully!" });
     });
@@ -34,6 +33,14 @@ async function addProduct(req, res) {
 
 async function updateProduct(req, res) {
   try {
+    if (req.files) {
+      const filePaths = [];
+      req.files.forEach((element) => {
+        filePaths.push(element.path);
+      });
+      req.body = { ...req.body, image: filePaths };
+    }
+
     await Product.findByIdAndUpdate(req.params.id, req.body).then(() => {
       res.status(200).json({ msg: "Product Updated Sucessfully!" });
     });
@@ -57,7 +64,7 @@ async function deleteProduct(req, res) {
 async function getProductByID(req, res) {
   try {
     let product = await Product.findById(req.params.id);
-    
+
     //? Getting 8 Related Products
     let relatedProducts = await Product.aggregate([
       {
@@ -69,11 +76,11 @@ async function getProductByID(req, res) {
       },
       { $sample: { size: 8 } },
     ]);
-    product = {...product._doc, image: product.image.split(',')};
-    relatedProducts.forEach((value, index)=>{
-      relatedProducts[index].image =  value.image.split(',')[0];
+    product = { ...product._doc, image: product.image.split(",") };
+    relatedProducts.forEach((value, index) => {
+      relatedProducts[index].image = value.image.split(",")[0];
     });
-    
+
     res
       .status(200)
       .json({ product: product, relatedProducts: relatedProducts });
@@ -105,8 +112,8 @@ async function searchProducts(req, res) {
         name: { $regex: regex },
         status: true,
       });
-      results.forEach((value, index)=>{
-        results[index].image =  value.image.split(',')[0];
+      results.forEach((value, index) => {
+        results[index].image = value.image.split(",")[0];
       });
       res.status(200).json(results);
     } else {
@@ -146,8 +153,8 @@ async function getFeaturedProducts(req, res) {
       { $match: { featured: true, status: true } },
       // { $sample: { size: 8 } },
     ]);
-    featuredProducts.forEach((value, index)=>{
-      featuredProducts[index].image =  value.image.split(',')[0];
+    featuredProducts.forEach((value, index) => {
+      featuredProducts[index].image = value.image.split(",")[0];
     });
     res.status(200).json(featuredProducts);
   } catch (err) {
@@ -157,8 +164,8 @@ async function getFeaturedProducts(req, res) {
 async function getLatestProducts(req, res) {
   try {
     let latestProducts = await Product.find().sort({ _id: -1 }).limit(8);
-    latestProducts.forEach((value, index)=>{
-      latestProducts[index].image =  value.image.split(',')[0];
+    latestProducts.forEach((value, index) => {
+      latestProducts[index].image = value.image.split(",")[0];
     });
     res.json(latestProducts);
   } catch (err) {

@@ -104,15 +104,21 @@ async function searchProducts(req, res) {
   try {
     if (req.query.q !== "") {
       const regex = new RegExp(req.query.q, "i");
-      let results = await Product.find({
-        name: { $regex: regex },
-        status: true,
-      });
-      
+      let results;
+      if (req.query.mpn === "true" || req.query.mpn === "True") {
+        results = await Product.find({
+          mpn: { $regex: regex },
+          status: true,
+        });
+      } else {
+        results = await Product.find({
+          name: { $regex: regex },
+          status: true,
+        });
+      }
+
       res.status(200).json(results);
     } else {
-      // let results = await Product.find({status : true});
-      // res.status(200).json(results);
       res.status(200).json();
     }
   } catch (err) {
@@ -145,13 +151,13 @@ async function getFeaturedProducts(req, res) {
   try {
     let featuredProducts = await Product.find(
       // [
-      // { $match: 
-        { featured: true, status: true } 
+      // { $match:
+      { featured: true, status: true }
       // },
       // { $sample: { size: 8 } },
-    // ]
+      // ]
     );
-    
+
     res.status(200).json(featuredProducts);
   } catch (err) {
     res.status(500).json(err);
@@ -160,7 +166,7 @@ async function getFeaturedProducts(req, res) {
 async function getLatestProducts(req, res) {
   try {
     let latestProducts = await Product.find().sort({ _id: -1 }).limit(8);
-    
+
     res.json(latestProducts);
   } catch (err) {
     res.status(500).json(err);

@@ -10,7 +10,19 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    image: [{ type: String, default: ["Uploads\\images\\default.jpg"] }], ////array of strings for images path
+    image: [
+        { 
+            type: String,
+            default: ["Uploads\\images\\default.jpg"] 
+        }
+    ],
+    mpn: {
+        type: String,
+        required: true,
+    },
+    pdf: {
+        type: String,
+    },
     stock: {
       type: Number,
       required: true,

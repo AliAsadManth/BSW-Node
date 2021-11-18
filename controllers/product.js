@@ -76,10 +76,6 @@ async function getProductByID(req, res) {
       },
       { $sample: { size: 8 } },
     ]);
-    product = { ...product._doc, image: product.image.split(",") };
-    relatedProducts.forEach((value, index) => {
-      relatedProducts[index].image = value.image.split(",")[0];
-    });
 
     res
       .status(200)
@@ -112,9 +108,7 @@ async function searchProducts(req, res) {
         name: { $regex: regex },
         status: true,
       });
-      results.forEach((value, index) => {
-        results[index].image = value.image.split(",")[0];
-      });
+      
       res.status(200).json(results);
     } else {
       // let results = await Product.find({status : true});
@@ -149,13 +143,15 @@ async function featureProduct(req, res) {
 }
 async function getFeaturedProducts(req, res) {
   try {
-    let featuredProducts = await Product.aggregate([
-      { $match: { featured: true, status: true } },
+    let featuredProducts = await Product.find(
+      // [
+      // { $match: 
+        { featured: true, status: true } 
+      // },
       // { $sample: { size: 8 } },
-    ]);
-    featuredProducts.forEach((value, index) => {
-      featuredProducts[index].image = value.image.split(",")[0];
-    });
+    // ]
+    );
+    
     res.status(200).json(featuredProducts);
   } catch (err) {
     res.status(500).json(err);
@@ -164,9 +160,7 @@ async function getFeaturedProducts(req, res) {
 async function getLatestProducts(req, res) {
   try {
     let latestProducts = await Product.find().sort({ _id: -1 }).limit(8);
-    latestProducts.forEach((value, index) => {
-      latestProducts[index].image = value.image.split(",")[0];
-    });
+    
     res.json(latestProducts);
   } catch (err) {
     res.status(500).json(err);

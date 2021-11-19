@@ -15,14 +15,18 @@ async function getAllProducts(req, res) {
 
 async function addProduct(req, res) {
   try {
-    if (req.files) {
+    if (req.files.image) {
+      let images = req.files.image;
       const filePaths = [];
-      req.files.forEach((element) => {
-        filePaths.push(element.path);
+      images.forEach((image) => {
+        filePaths.push(image.path);
       });
       req.body = { ...req.body, image: filePaths };
     }
-
+    if (req.files.pdf) {
+      let pdf = req.files.pdf;
+      req.body = { ...req.body, pdf: pdf[0].path };
+    }
     await Product.create(req.body).then(() => {
       res.status(200).json({ msg: "Product created sucessfully!" });
     });
@@ -33,14 +37,20 @@ async function addProduct(req, res) {
 
 async function updateProduct(req, res) {
   try {
-    if (req.files) {
+
+    if (req.files.image) {
+      let images = req.files.image;
       const filePaths = [];
-      req.files.forEach((element) => {
-        filePaths.push(element.path);
+      images.forEach((image) => {
+        filePaths.push(image.path);
       });
       req.body = { ...req.body, image: filePaths };
     }
-
+    if (req.files.pdf) {
+      let pdf = req.files.pdf[0];
+      req.body = { ...req.body, pdf: pdf.path };
+    }
+    
     await Product.findByIdAndUpdate(req.params.id, req.body).then(() => {
       res.status(200).json({ msg: "Product Updated Sucessfully!" });
     });
@@ -172,6 +182,7 @@ async function getLatestProducts(req, res) {
     res.status(500).json(err);
   }
 }
+
 module.exports = {
   getAllProducts,
   addProduct,

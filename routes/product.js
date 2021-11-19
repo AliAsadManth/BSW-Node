@@ -15,23 +15,30 @@ const {
   getLatestProducts,
 } = require("../controllers/product");
 
+//? Image Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./Uploads/images");
+    if(file.fieldname === "image"){
+      cb(null, "./Uploads/images");
+    } else if (file.fieldname === "pdf"){
+      cb(null, "./Uploads/pdf");
+    }
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now().toString() + file.originalname);
+    let fileName = Date.now().toString() + Math.random().toString(8).split(".").pop() +"."+ file.originalname.split('.').pop();
+    cb(null, fileName);
   },
 });
-const uploadImage = multer({ storage: storage });
+const upload = multer({ storage: storage });
+const uploader = upload.fields([{name: "image", maxCount: 5},{name: "pdf", maxCount: 1},]);
 
 router.get("/", getAllProducts);
-router.post("/create", uploadImage.array("image", 5), addProduct);
+router.post("/create", uploader, addProduct);
 router.get("/search", searchProducts);
 router.get("/featured", getFeaturedProducts);
 router.get("/getlatest", getLatestProducts);
 router.get("/:id", getProductByID);
-router.put("/:id/update", uploadImage.array("image", 5), updateProduct);
+router.put("/:id/update", uploader, updateProduct);
 router.put("/:id/delete", deleteProduct);
 router.put("/:id/addstock", addStock);
 router.put("/:id/feature", featureProduct);

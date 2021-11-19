@@ -15,7 +15,8 @@ const storage = multer.diskStorage({
         cb(null, "./uploads/sliders");
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now().toString() + file.originalname);
+        let fileName = Date.now().toString() + Math.random().toString(8).split(".").pop() +"."+ file.originalname.split('.').pop();
+        cb(null, fileName);
     }
 });
 const uploadSlider = multer({storage: storage});

@@ -5,10 +5,15 @@ async function addToCart(req, res) {
     let chk = false;
     let index = -1;
     try {
+        if(parseInt(req.body.quatity) === 0){
+            res.json({status: 201, msg: "Quantity cannot be 0!"});
+            return;
+        }
+        
         let cartChk = await Cart.countDocuments({userId: req.params.uid});
         if(cartChk !== 0){
             let cart = await Cart.findOne({userId: req.params.uid});
-            
+
             cart.product.forEach((singleProduct, i) => {
                 if(singleProduct.productId == req.body.productId){
                     chk = true; //? Product Find
@@ -16,7 +21,7 @@ async function addToCart(req, res) {
                 }
             });
             if(chk){
-                cart.product[index].quatity += req.body.quatity;
+                cart.product[index].quatity += parseInt(req.body.quatity);
                 await Cart.findByIdAndUpdate(cart._id, cart).then(()=>{
                     res.status(200).json({msg: "Product Added to Cart."});
                 });
@@ -79,7 +84,7 @@ async function decrement(req, res) {
 
 async function getCart(req, res) {
     try {
-        let cart = await Cart.findOne({userId: req.params.uid}).populate('product.productId', "name image");
+        let cart = await Cart.findOne({userId: req.params.uid}).populate('product.productId');
         res.status(200).json(cart);
     } catch (err) {
         res.status(500).json(err);

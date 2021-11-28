@@ -8,9 +8,10 @@ const {
     removeFromCart,
 } = require("../controllers/cart");
 
+// ? id => product id, uid => user id
 router.get("/:uid", getCart);
 router.post("/add/:uid", addToCart);
-router.delete("/delete/:id/:uid", removeFromCart);
+router.delete("/remove/:id/:uid", removeFromCart);
 router.put("/increment/:id/:uid", increment);
 router.put("/decrement/:id/:uid", decrement);
 

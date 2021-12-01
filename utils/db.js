@@ -17,4 +17,5 @@ module.exports = {
 	SubCategory: require("../models/subCategory"),
 	Order: require("../models/order"),
 	Slider: require("../models/slider"),
+	Tax: require("../models/tax"),
 };

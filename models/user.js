@@ -19,15 +19,15 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    status: {
+    status: { //? User Email verified => true
         type: Boolean,
         default: false,
     },
-    otp: {
+    otp: { //? change password otp 
         type: String,
         require: true,
     },
-    role: {
+    role: { //? Admin or user
         type: String,
         default: "user",
     },

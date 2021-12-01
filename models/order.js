@@ -5,18 +5,25 @@ const orderSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
     },
-    totalPrice: {
+    cartId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "cart",
+    },
+    totalPrice: { //? price of products bought
         type: Number,
         required: true,
     },
     tax: {
         type: Number,
+        required: true,
     },
     deliveryCharges: {
         type: Number,
+        required: true,
     },
     grandTotal: {
         type: Number,
+        required: true,
     }
 },{ timestamps: true });
 

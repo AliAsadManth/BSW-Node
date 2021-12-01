@@ -1,7 +1,7 @@
 const db = require("../utils/db");
 const Cart = db.Cart;
 
-async function addToCart(req, res) {
+async function addToCart(req, res) { // TODO: Product fromm cart to Orders
     let chk = false;
     let index = -1;
     try {
@@ -10,9 +10,9 @@ async function addToCart(req, res) {
             return;
         }
         
-        let cartChk = await Cart.countDocuments({userId: req.params.uid});
+        let cartChk = await Cart.countDocuments({userId: req.params.uid, status: false});
         if(cartChk !== 0){
-            let cart = await Cart.findOne({userId: req.params.uid});
+            let cart = await Cart.findOne({userId: req.params.uid, status: false});
 
             cart.product.forEach((singleProduct, i) => {
                 if(singleProduct.productId == req.body.productId){
@@ -84,7 +84,36 @@ async function decrement(req, res) {
 
 async function getCart(req, res) {
     try {
-        let cart = await Cart.findOne({userId: req.params.uid}).populate('product.productId');
+        let goodsTotal = 0;
+        let amount = [];
+        let tax = 0;
+        let delivery = 0;
+        let grandTotal = 0;
+        let cart = await Cart.findOne({userId: req.params.uid, status: false}).populate('product.productId');
+        cart.product.forEach((doc, index)=>{
+            let price  = doc.productId.price * doc.quatity;
+            amount.push(price);
+            goodsTotal += price;
+        });
+        let taxInfo = await db.Tax.findOne();
+        delivery = taxInfo.delivery;
+        if(goodsTotal >= 100){
+            tax = parseFloat((goodsTotal / taxInfo.tax).toFixed(2));
+            delivery = 0;
+        } else if(goodsTotal === 0){
+            tax = 0;
+            delivery = 0;
+        } else {
+            tax = parseFloat(((goodsTotal + delivery) / taxInfo.tax).toFixed(2));
+        }
+        grandTotal = parseFloat((goodsTotal + delivery + tax).toFixed(2));
+        let calc = {
+            goodsTotal: goodsTotal,
+            tax: tax,
+            delivery: delivery,
+            grandTotal: grandTotal,
+        }
+        cart = {cart: cart, amount: amount, calc: calc}
         res.status(200).json(cart);
     } catch (err) {
         res.status(500).json(err);

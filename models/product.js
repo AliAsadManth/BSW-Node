@@ -16,18 +16,18 @@ const productSchema = mongoose.Schema(
             default: ["Uploads\\images\\default.jpg"],
         }
     ],
-    mpn: {
+    mpn: { //? Manufacturing part number 
         type: String,
         required: true,
     },
-    pdf: {
+    pdf: { //? product pdf file
         type: String,
     },
-    stock: {
+    stock: { //? availabe stock
       type: Number,
       required: true,
     },
-    price: {
+    price: { 
       type: Number,
       required: true,
     },
@@ -35,11 +35,11 @@ const productSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "subCategory",
     },
-    featured: {
+    featured: { //? show product on main page
       type: Boolean,
       default: false,
     },
-    status: {
+    status: { //? product availabe or not
       type: Boolean,
       default: true,
     },

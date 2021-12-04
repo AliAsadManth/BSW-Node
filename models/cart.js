@@ -14,10 +14,6 @@ const cartSchema = mongoose.Schema({
     status: { //? False => Still in cart, True => Ordered Products
         type: Boolean,
         default: false,
-    },
-    orderId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "orders",
     }
 },{ timestamps: true });
 

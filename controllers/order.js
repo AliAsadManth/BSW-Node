@@ -8,6 +8,7 @@ async function getOrders(req, res) {
 async function placeOrders(req, res) {
   res.json(req.params.id);
 }
+<<<<<<< HEAD
 
 async function checkout(req, res) {
   try {
@@ -30,6 +31,9 @@ async function checkout(req, res) {
   }
 }
 
+=======
+// TODO: DELETE ORDER...
+>>>>>>> c3905be4b1136946380eefdabb6070beaa6ffc06
 module.exports = {
   getOrders,
   placeOrders,

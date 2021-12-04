@@ -3,10 +3,9 @@ const Product = db.Product;
 
 async function getAllProducts(req, res) {
   try {
-    let products = await Product.find().populate(
-      "categoryId",
-      "name parentCategory"
-    ).sort({ _id: -1 });
+    let products = await Product.find()
+      .populate("categoryId", "name parentCategory")
+      .sort({ _id: -1 });
     res.status(200).json(products);
   } catch (err) {
     res.status(500).json(err);
@@ -17,7 +16,7 @@ async function addProduct(req, res) {
   try {
     if (req.files.image) {
       let images = req.files.image;
-      const filePaths = [];
+      let filePaths = [];
       images.forEach((image) => {
         filePaths.push(image.path);
       });
@@ -37,7 +36,6 @@ async function addProduct(req, res) {
 
 async function updateProduct(req, res) {
   try {
-
     if (req.files.image) {
       let images = req.files.image;
       const filePaths = [];
@@ -50,7 +48,7 @@ async function updateProduct(req, res) {
       let pdf = req.files.pdf[0];
       req.body = { ...req.body, pdf: pdf.path };
     }
-    
+
     await Product.findByIdAndUpdate(req.params.id, req.body).then(() => {
       res.status(200).json({ msg: "Product Updated Sucessfully!" });
     });
@@ -183,6 +181,17 @@ async function getLatestProducts(req, res) {
   }
 }
 
+async function getByCategoryID(req, res) {
+  try {
+    let productsByCategoryID = await Product.find({
+      categoryId: req.params.cid,
+    }).populate("categoryId", "name");
+    res.json(productsByCategoryID);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+
 module.exports = {
   getAllProducts,
   addProduct,
@@ -194,4 +203,5 @@ module.exports = {
   featureProduct,
   getFeaturedProducts,
   getLatestProducts,
+  getByCategoryID,
 };

@@ -1,19 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const checkAuth = require("../middlewares/checkAuth");
+const checkGuest = require("../middlewares/checkGuest");
 //TODO: Get all methods from controllers
 const {
-	createUser,
-	getAllUsers,
-	getUserById,
-	updateUser,
-	updatePassword,
-	login,
-	loggedIn,
-	logout,
-	verification,
-	forgetPassword,
-	contactUs,
+  createUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  updatePassword,
+  login,
+  loggedIn,
+  logout,
+  verification,
+  forgetPassword,
+  contactUs,
+  createGuest,
+  guestLoggedin,
+  guestLogout,
 } = require("../controllers/user");
 
 //TODO: User Routes
@@ -28,5 +32,8 @@ router.get("/userverification/:id/:otp", verification);
 router.post("/login", login);
 router.patch("/loggedin", checkAuth, loggedIn); //! not working with get
 router.delete("/logout", logout);
+router.post("/createguest", createGuest);
+router.patch("/guestloggedin", checkGuest, guestLoggedin); //! not working with get
+router.delete("/guestLogout", guestLogout);
 
 module.exports = router;

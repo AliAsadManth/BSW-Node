@@ -7,6 +7,7 @@ async function getOrders(req, res) {
 async function placeOrders(req, res) {
     res.json(req.params.id);
 }
+// TODO: DELETE ORDER...
 module.exports = {
     getOrders,
     placeOrders

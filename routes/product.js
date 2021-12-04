@@ -13,6 +13,7 @@ const {
   featureProduct,
   getFeaturedProducts,
   getLatestProducts,
+  getByCategoryID,
 } = require("../controllers/product");
 
 //? Image Storage
@@ -37,6 +38,7 @@ router.post("/create", uploader, addProduct);
 router.get("/search", searchProducts);
 router.get("/featured", getFeaturedProducts);
 router.get("/getlatest", getLatestProducts);
+router.get("/getByCatId/:cid", getByCategoryID);
 router.get("/:id", getProductByID);
 router.put("/:id/update", uploader, updateProduct);
 router.put("/:id/delete", deleteProduct);

@@ -91,26 +91,29 @@ async function getCart(req, res) {
     let tax = 0;
     let delivery = 0;
     let grandTotal = 0;
+
     let cart = await Cart.findOne({
       userId: req.params.uid,
       status: false,
     }).populate("product.productId");
-    cart.product.forEach((doc, index) => {
-      let price = doc.productId.price * doc.quatity;
-      goodsTotal += price;
-    });
-    let taxInfo = await db.Tax.findOne();
-    delivery = taxInfo.delivery;
-    if (goodsTotal >= 100) {
-      tax = parseFloat((goodsTotal / taxInfo.tax).toFixed(2));
-      delivery = 0;
-    } else if (goodsTotal === 0) {
-      tax = 0;
-      delivery = 0;
-    } else {
-      tax = parseFloat(((goodsTotal + delivery) / taxInfo.tax).toFixed(2));
+    if(cart !== null){
+      cart.product.forEach((doc, index) => {
+        let price = doc.productId.price * doc.quatity;
+        goodsTotal += price;
+      });
+      let taxInfo = await db.Tax.findOne();
+      delivery = taxInfo.delivery;
+      if (goodsTotal >= 100) {
+        tax = parseFloat((goodsTotal / taxInfo.tax).toFixed(2));
+        delivery = 0;
+      } else if (goodsTotal === 0) {
+        tax = 0;
+        delivery = 0;
+      } else {
+        tax = parseFloat(((goodsTotal + delivery) / taxInfo.tax).toFixed(2));
+      }
+      grandTotal = parseFloat((goodsTotal + delivery + tax).toFixed(2));
     }
-    grandTotal = parseFloat((goodsTotal + delivery + tax).toFixed(2));
     let calc = {
       goodsTotal: goodsTotal,
       tax: tax,

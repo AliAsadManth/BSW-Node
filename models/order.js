@@ -16,7 +16,7 @@ const orderSchema = mongoose.Schema(
       enum: [0, 1, 2, 3],
       default: 0,
     },
-    totalPrice: {
+    goodsTotal: {
       //? price of products bought
       type: Number,
       required: true,

@@ -62,7 +62,6 @@ async function placeOrders(req, res) {
 }
 async function deleteOrder(req, res) {
   try {
-    // TODO: DELETE ORDER ...
     let order = await Order.findById(req.params.oid);
     let cartId = order.cartId;
     await Order.findByIdAndDelete(order._id).then(async ()=>{

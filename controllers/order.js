@@ -1,17 +1,21 @@
 const db = require("../utils/db");
 const Order = db.Order;
 const Cart = db.Cart;
+const Product = db.Product;
 const stripe = require("stripe")(process.env.STRIPE_URI);
 
 async function getOrders(req, res) {
   try {
-    let orders = await Order.find().populate({
-      path: "cartId",
-      populate: {
-        path: "product.productId",
-        model: "product"
-      }
-    }).sort({_id: -1}).populate("userId");
+    let orders = await Order.find()
+      .populate({
+        path: "cartId",
+        populate: {
+          path: "product.productId",
+          model: "product",
+        },
+      })
+      .sort({ _id: -1 })
+      .populate("userId");
     res.json(orders);
   } catch (err) {
     res.status(500).json(err);
@@ -19,13 +23,15 @@ async function getOrders(req, res) {
 }
 async function getOrderById(req, res) {
   try {
-    let orders = await Order.find({userId: req.params.id}).populate({
-      path: "cartId",
-      populate: {
-        path: "product.productId",
-        model: "product"
-      }
-    }).sort({_id: -1});
+    let orders = await Order.find({ userId: req.params.id })
+      .populate({
+        path: "cartId",
+        populate: {
+          path: "product.productId",
+          model: "product",
+        },
+      })
+      .sort({ _id: -1 });
     res.json(orders);
   } catch (err) {
     res.status(500).json(err);
@@ -35,22 +41,35 @@ async function placeOrders(req, res) {
   try {
     let order = Order(req.body);
     order.userId = req.params.id;
-    await Order.create(order).then(async ()=>{
+    await Order.create(order).then(async () => {
       let cart = await Cart.findById(order.cartId);
       cart.status = true;
       cart.orderId = order._id;
-      await Cart.findByIdAndUpdate(order.cartId, cart).then(()=>{
-        res.json({msg: "Order placed sucessfully", orderId : order._id});
+      cart.product.forEach(async (product) => {
+        let productId = product.productId;
+        let quantity = product.quatity;
+        let db_product = await Product.findById(productId);
+        db_product.stock -= quantity;
+        await Product.findByIdAndUpdate(db_product._id, db_product);
+      });
+      await Cart.findByIdAndUpdate(order.cartId, cart).then(() => {
+        res.json({ msg: "Order placed sucessfully", orderId: order._id });
       });
     });
   } catch (err) {
     res.status(500).json(err);
   }
 }
-async function deleteOrder(req, res){
-  try{
+async function deleteOrder(req, res) {
+  try {
     // TODO: DELETE ORDER ...
-    res.json(req.params.oid);
+    let order = await Order.findById(req.params.oid);
+    let cartId = order.cartId;
+    await Order.findByIdAndDelete(order._id).then(async ()=>{
+      await Cart.findByIdAndDelete(cartId).then(()=>{
+        res.json({msg: "Order Deleted Sucessfully"});
+      });
+    });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -81,5 +100,5 @@ module.exports = {
   placeOrders,
   checkout,
   getOrderById,
-  deleteOrder
+  deleteOrder,
 };

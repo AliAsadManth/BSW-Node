@@ -11,7 +11,7 @@ async function getOrders(req, res) {
         path: "product.productId",
         model: "product"
       }
-    }).sort({status: 1}).populate("userId");
+    }).sort({_id: -1}).populate("userId");
     res.json(orders);
   } catch (err) {
     res.status(500).json(err);
@@ -25,7 +25,7 @@ async function getOrderById(req, res) {
         path: "product.productId",
         model: "product"
       }
-    }).sort({status: 1});
+    }).sort({_id: -1});
     res.json(orders);
   } catch (err) {
     res.status(500).json(err);

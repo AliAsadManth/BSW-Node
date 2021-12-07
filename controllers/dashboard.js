@@ -24,25 +24,23 @@ async function dashboard(req, res) {
   });
 
   //? sales per day - amount
-//   let sales_day = await db.Order.aggregate([
-//     {
-//       $match: { createdAt: { $gte: today } },
-//     },
-//     {
-//       $group: {
-//         _id: {
-//           day: { $dayOfMonth: "$createdAt" },
-//         },
-//         count: { $sum: "$grandTotal" },
-//       },
-//     },
-//   ]);
+  let sales_day = await db.Order.aggregate([
+    {
+      $match: { createdAt: { $gte: today } },
+    },
+    {
+      $group: {
+        _id: null,
+        "sales": {$sum: "$grandTotal"},
+      }
+    },
+  ]);
 
-  let sales_day_docs = await db.Order.find({createdAt: {$gte: today}});
-  let sales_day = 0;
-  sales_day_docs.forEach(sales => {
-      sales_day += sales.grandTotal;
-  });
+  // let sales_day_docs = await db.Order.find({createdAt: {$gte: today}});
+  // let sales_day = 0;
+  // sales_day_docs.forEach(sales => {
+  //     sales_day += sales.grandTotal;
+  // });
 
   //! Graphs - duration 6 month
   //? Sales per month

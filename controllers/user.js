@@ -464,6 +464,14 @@ async function logout(req, res) {
 
 async function createGuest(req, res) {
   try {
+    const checkEmail = await User.findOne({
+      email: req.body.email,
+    });
+    const checkPhone = await User.findOne({
+      phone_no: "+61" + req.body.phone,
+    });
+    if (checkEmail) throw "User already exist with this email!";
+    if (checkPhone) throw "User already exist with this phone number!";
     const data = {
       name: req.body.name,
       email: req.body.email,

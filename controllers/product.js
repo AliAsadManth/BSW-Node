@@ -30,6 +30,7 @@ async function addProduct(req, res) {
       res.status(200).json({ msg: "Product created sucessfully!" });
     });
   } catch (err) {
+    console.log("error----->", err.message);
     res.status(500).json(err);
   }
 }

@@ -25,23 +25,26 @@ async function addToCart(req, res) {
       });
       if (chk) {
         cart.product[index].quatity += parseInt(req.body.quatity);
-        await Cart.findByIdAndUpdate(cart._id, cart).then(() => {
-          res.status(200).json({ msg: "Product Added to Cart." });
-        });
+        let data = await Cart.findByIdAndUpdate(cart._id, cart).populate(
+          "product.productId"
+        );
+        res.status(200).json({ msg: "Product Added to Cart.", data });
       } else {
         cart.product.push(req.body);
-        await Cart.findByIdAndUpdate(cart._id, cart).then(() => {
-          res.status(200).json({ msg: "Product Added to Cart." });
-        });
+        let data = await Cart.findByIdAndUpdate(cart._id, cart).populate(
+          "product.productId"
+        );
+        res.status(200).json({ msg: "Product Added to Cart.", data });
       }
     } else {
       let cart = Cart({ userId: req.params.uid });
       cart.product.push(req.body);
-      await Cart.create(cart).then(() => {
-        res.status(200).json({ msg: "Product Added to Cart." });
-      });
+      let data = await Cart.create(cart);
+      data = await data.populate("product.productId");
+      res.status(200).json({ msg: "Product Added to Cart.", data });
     }
   } catch (err) {
+    console.log(err.message);
     res.status(500).json(err);
   }
 }

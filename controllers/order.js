@@ -40,7 +40,20 @@ async function getOrderById(req, res) {
 async function placeOrders(req, res) {
   try {
     let order = Order(req.body);
+    let prev_order = await Order.findOne().sort({ _id: -1 });
     order.userId = req.params.id;
+
+    // .limit(1);
+    if(!prev_order){
+      order.invoiceNo = 1;
+      res.json("if");
+    }
+     else{
+      order.invoiceNo = prev_order.invoiceNo + 1;
+      // res.json("else");
+    }
+    
+    // order.invoiceNo
     await Order.create(order).then(async () => {
       let cart = await Cart.findById(order.cartId);
       cart.status = true;

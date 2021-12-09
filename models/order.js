@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const orderSchema = mongoose.Schema(
   {
+    invoiceNo:{
+      type: Number,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",

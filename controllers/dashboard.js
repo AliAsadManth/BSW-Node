@@ -8,15 +8,25 @@ async function dashboard(req, res) {
   var firstDay = new Date(y, m, 1);
   var lastDay = new Date(y, m + 1, 0);
   var today = new Date(y, m, d );
-
+  
   //! Cards
   //? Total Signups in current month
   let signups = await db.User.countDocuments({
     createdAt: { $gte: firstDay, $lt: lastDay },
   });
+  
+  // !ON HOLD
+  // var firstDay_lm = new Date(y, m-1, 1);
+  // var lastDay_lm = new Date(y, m, 0);
+  // let signups_lm = await db.User.countDocuments({
+  //   createdAt: { $gte: firstDay_lm, $lt: lastDay_lm },
+  // });
+  //! ^
 
   //? Total Products
-  let products = await db.Product.countDocuments();
+  let pending_orders = await db.Order.countDocuments({
+    status: {$lte: 1}
+  });
 
   //? orders per day - Count
   let orders_day = await db.Order.countDocuments({
@@ -54,8 +64,8 @@ async function dashboard(req, res) {
   res.json({
     //! Cards
     signups: signups,
-    products: products,
     orders_day: orders_day,
+    pending_orders: pending_orders,
     sales_day: sales_day,
     //! Graphs
     sales_month: sales_month,

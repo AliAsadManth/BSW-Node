@@ -49,7 +49,7 @@ async function dashboard(req, res) {
   if(sales_day.length === 0){
     sales_day = 0;
   } else {
-    sales_day = sales_day[0].sales;
+    sales_day = parseFloat(sales_day[0].sales.toFixed(2));
   }
   // let sales_day_docs = await db.Order.find({createdAt: {$gte: today}});
   // let sales_day = 0;

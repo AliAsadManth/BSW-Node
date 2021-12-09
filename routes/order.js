@@ -6,10 +6,12 @@ const {
   placeOrders,
   checkout,
   getOrderById,
-  deleteOrder
+  deleteOrder,
+  invoice
 } = require("../controllers/order");
 
 router.get("/", getOrders);
+router.get("/invoice/:id", invoice); //? id -> order id
 router.post("/placeOrder/:id", placeOrders); //? id -> user id
 router.patch("/checkout", checkout);
 router.get("/:id", getOrderById); //? id -> user id

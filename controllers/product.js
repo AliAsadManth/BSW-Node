@@ -26,8 +26,8 @@ async function addProduct(req, res) {
       let pdf = req.files.pdf;
       req.body = { ...req.body, pdf: pdf[0].path };
     }
-    await Product.create(req.body).then(() => {
-      res.status(200).json({ msg: "Product created sucessfully!" });
+    await Product.create(req.body).then((data) => {
+      res.status(200).json({ msg: "Product created sucessfully!", data });
     });
   } catch (err) {
     console.log("error----->", err.message);

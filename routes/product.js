@@ -19,19 +19,30 @@ const {
 //? Image Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    if(file.fieldname === "image"){
+    if (file.fieldname === "image") {
       cb(null, "./Uploads/images");
-    } else if (file.fieldname === "pdf"){
-      cb(null, "./Uploads/pdf");
+    } else if (file.fieldname === "pdf") {
+      if (file.mimetype === "application/pdf") {
+        cb(null, "./Uploads/pdf");
+      } else {
+        cb(new Error("Invalid PDF File!"));
+      }
     }
   },
   filename: (req, file, cb) => {
-    let fileName = Date.now().toString() + Math.random().toString(8).split(".").pop() +"."+ file.originalname.split('.').pop();
+    let fileName =
+      Date.now().toString() +
+      Math.random().toString(8).split(".").pop() +
+      "." +
+      file.originalname.split(".").pop();
     cb(null, fileName);
   },
 });
 const upload = multer({ storage: storage });
-const uploader = upload.fields([{name: "image", maxCount: 5},{name: "pdf", maxCount: 1},]);
+const uploader = upload.fields([
+  { name: "image", maxCount: 5 },
+  { name: "pdf", maxCount: 1 },
+]);
 
 router.get("/", getAllProducts);
 router.post("/create", uploader, addProduct);

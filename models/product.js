@@ -34,6 +34,7 @@ const productSchema = mongoose.Schema(
     categoryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "subCategory",
+      required: true,
     },
     featured: { //? show product on main page
       type: Boolean,

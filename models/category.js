@@ -7,6 +7,7 @@ const categorySchema = mongoose.Schema({
     },
     parentCategory: {
         type: String,
+        enum: ["10001", "10002", "10003", "10004"],
         required: true,
     }
 },{ timestamps: true });

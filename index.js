@@ -16,13 +16,14 @@ app.use("/api", require("./routes/index"));
 
 //! Static Image and Slider folders
 app.use("/uploads/images", express.static("./Uploads/images"));
+app.use("/uploads/pdf", express.static("./Uploads/pdf"));
 app.use("/uploads/sliders", express.static("./Uploads/sliders"));
 
 //? Test Route
 app.use("/", (req, res) => {
-	res.send(
-		"<center><h1 style='color:Tomato; font-size: 100;'>Main Page!</h1></center>",
-	);
+  res.send(
+    "<center><h1 style='color:Tomato; font-size: 100;'>Main Page!</h1></center>"
+  );
 });
 
 //? listening to server

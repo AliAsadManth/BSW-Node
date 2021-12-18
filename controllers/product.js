@@ -5,12 +5,12 @@ async function getAllProducts(req, res) {
   try {
     let page = req.query.page || 1;
     let items_per_page = 12;
-    let product_count = await Product.countDocuments();
+    let product_count = await Product.find({status: true}).countDocuments();
     let total_pages = Math.ceil(product_count / items_per_page);
     if (page > total_pages) {
       page = total_pages;
     }
-    let products = await Product.find()
+    let products = await Product.find({status: true})
       .populate("categoryId", "name parentCategory")
       .sort({ _id: -1 })
       .skip((page - 1) * items_per_page)

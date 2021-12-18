@@ -47,7 +47,7 @@ async function placeOrders(req, res) {
     // .limit(1);
     if (!prev_order) {
       order.invoiceNo = 1;
-      res.json("if");
+      // res.json("if");
     } else {
       order.invoiceNo = prev_order.invoiceNo + 1;
       // res.json("else");

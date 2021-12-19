@@ -82,6 +82,7 @@ async function deleteProduct(req, res) {
   try {
     let product = await Product.findById(req.params.id);
     product.status = false;
+    product.featured = false;
     await Product.findByIdAndUpdate(req.params.id, product).then(() => {
       res.status(200).json({ msg: "Product Deleted" });
     });
@@ -219,12 +220,7 @@ async function featureProduct(req, res) {
 async function getFeaturedProducts(req, res) {
   try {
     let featuredProducts = await Product.find(
-      // [
-      // { $match:
       { featured: true, status: true }
-      // },
-      // { $sample: { size: 8 } },
-      // ]
     );
 
     res.status(200).json(featuredProducts);
@@ -248,6 +244,7 @@ async function getByCategoryID(req, res) {
     let items_per_page = 12;
     let product_count = await Product.find({
       categoryId: req.params.cid,
+      status: true
     }).countDocuments();
     let total_pages = Math.ceil(product_count / items_per_page);
     if (page > total_pages) {
@@ -255,6 +252,7 @@ async function getByCategoryID(req, res) {
     }
     let productsByCategoryID = await Product.find({
       categoryId: req.params.cid,
+      status: true
     })
       .populate("categoryId", "name")
       .sort({ _id: -1 })

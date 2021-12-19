@@ -47,10 +47,8 @@ async function placeOrders(req, res) {
     // .limit(1);
     if (!prev_order) {
       order.invoiceNo = 1;
-      res.json("if");
     } else {
       order.invoiceNo = prev_order.invoiceNo + 1;
-      // res.json("else");
     }
 
     // order.invoiceNo
@@ -141,8 +139,10 @@ function buildPDF(dataCallback, endCallback, data) {
   // .image('../uploads/logo.png', 50, 45, { width: 50 })
   //   .fillColor("#444444")
   doc
-    .fontSize(30).fill("red", "even-odd")
-    .text("BSW-Engineering", 50, 45, { align: "left" }).fill("#262729", "even-odd")
+    .fontSize(30)
+    .fill("red", "even-odd")
+    .text("BSW-Engineering", 50, 45, { align: "left" })
+    .fill("#262729", "even-odd")
     .fontSize(10)
     .text("21 Darlot rd", 200, 45, { align: "right" })
     .text("Landsdale, WA 6065", 200, 65, { align: "right" })
@@ -174,11 +174,12 @@ function buildPDF(dataCallback, endCallback, data) {
 
   //? Table Data
   doc
-    .fontSize(11).fill("black", "even-odd")
+    .fontSize(11)
+    .fill("black", "even-odd")
     .text("Item", 50, 300)
     .text("Unit Cost", 300, 300)
-    .text("Quantity", 385, 300,)
-    .text("Total", 470, 300, )
+    .text("Quantity", 385, 300)
+    .text("Total", 470, 300)
     .moveDown();
   //? Line
   doc.moveTo(50, 315).lineTo(550, 315).fill("#262729", "even-odd");
@@ -192,15 +193,14 @@ function buildPDF(dataCallback, endCallback, data) {
       .text(`${product.productId.name}`, 50, position)
       .text(`$${product.productId.price}`, 300, position)
       .text(`${product.quatity}`, 385, position)
-      .text(
-        `$${product.productId.price * product.quatity}`,
-        470,
-        position,
-      )
+      .text(`$${product.productId.price * product.quatity}`, 470, position)
       .moveDown();
     //? Line
-    doc.moveTo(50, position + 15).lineTo(550, position + 15).fill("#262729", "even-odd");
-    
+    doc
+      .moveTo(50, position + 15)
+      .lineTo(550, position + 15)
+      .fill("#262729", "even-odd");
+
     position += 20;
   });
 
@@ -209,14 +209,65 @@ function buildPDF(dataCallback, endCallback, data) {
     .fontSize(10)
     .text("SubTotal", 300, position)
     .text(`$${data.goodsTotal}`, 470, position)
-    .text("GST", 300, position+20)
-    .text(`$${data.tax}`, 470, position+20)
-    .text("Delivery Charges", 300, position+40)
-    .text(`$${data.deliveryCharges}`, 470, position+40)
-    .text("Grand Total", 300, position+60)
-    .text(`$${data.grandTotal}`, 470, position+60)
+    .text("GST", 300, position + 20)
+    .text(`$${data.tax}`, 470, position + 20)
+    .text("Delivery Charges", 300, position + 40)
+    .text(`$${data.deliveryCharges}`, 470, position + 40)
+    .text("Grand Total", 300, position + 60)
+    .text(`$${data.grandTotal}`, 470, position + 60)
     .moveDown();
   doc.end();
+}
+
+async function Webhook(req, res) {
+  let sig = req.headers["stripe-signature"];
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.rawBody,
+      sig,
+      "whsec_ye98XrIHsI6XUAfmRTkLKZvdOkFMBduq" //////webhook scret key
+    );
+  } catch (error) {
+    res.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+  switch (event.type) {
+    case "checkout.session.completed": {
+      const session = event.data.object;
+      const metaData = session.metadata;
+      // Create Order here
+
+      /////////////////////////////
+      let order = Order(metaData);
+      let prev_order = await Order.findOne().sort({ _id: -1 });
+
+      if (!prev_order) {
+        order.invoiceNo = 1;
+      } else {
+        order.invoiceNo = prev_order.invoiceNo + 1;
+      }
+
+      await Order.create(order).then(async () => {
+        let cart = await Cart.findById(order.cartId);
+        cart.status = true;
+        cart.orderId = order._id;
+        cart.product.forEach(async (product) => {
+          let productId = product.productId;
+          let quantity = product.quatity;
+          let db_product = await Product.findById(productId);
+          db_product.stock -= quantity;
+          await Product.findByIdAndUpdate(db_product._id, db_product);
+        });
+        await Cart.findByIdAndUpdate(order.cartId, cart);
+      });
+      /////////////////////////////
+
+      break;
+    }
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
 }
 
 module.exports = {
@@ -226,4 +277,5 @@ module.exports = {
   getOrderById,
   deleteOrder,
   invoice,
+  Webhook,
 };

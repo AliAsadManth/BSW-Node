@@ -230,7 +230,7 @@ async function getFeaturedProducts(req, res) {
 }
 async function getLatestProducts(req, res) {
   try {
-    let latestProducts = await Product.find().sort({ _id: -1 }).limit(8);
+    let latestProducts = await Product.find().sort({ _id: -1 }).limit(6);
 
     res.json(latestProducts);
   } catch (err) {

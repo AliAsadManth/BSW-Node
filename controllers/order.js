@@ -6,7 +6,15 @@ const stripe = require("stripe")(process.env.STRIPE_URI);
 const PDFDocument = require("pdfkit");
 
 async function getOrders(req, res) {
+  // TODO: Pagination...
   try {
+    let page = req.query.page || 1;
+    let items_per_page = 12;
+    let order_count = await Order.countDocuments();
+    let total_pages = Math.ceil(order_count / items_per_page);
+    if (page > total_pages) {
+      page = total_pages;
+    }
     let orders = await Order.find()
       .populate({
         path: "cartId",
@@ -16,8 +24,20 @@ async function getOrders(req, res) {
         },
       })
       .sort({ _id: -1 })
-      .populate("userId");
-    res.json(orders);
+      .populate("userId")
+      .skip((page - 1) * items_per_page)
+      .limit(items_per_page);
+    res.json({
+      orders: orders,
+      total_orders: order_count,
+      total_pages: total_pages,
+      items_per_page: items_per_page,
+      current_page: parseInt(page),
+      has_next_page: page < total_pages,
+      has_previous_page: page > 1,
+      next_page: parseInt(page) + 1,
+      previous_page: page - 1,
+    });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -44,14 +64,12 @@ async function placeOrders(req, res) {
     let prev_order = await Order.findOne().sort({ _id: -1 });
     order.userId = req.params.id;
 
-    // .limit(1);
     if (!prev_order) {
       order.invoiceNo = 1;
     } else {
       order.invoiceNo = prev_order.invoiceNo + 1;
     }
 
-    // order.invoiceNo
     await Order.create(order).then(async () => {
       let cart = await Cart.findById(order.cartId);
       cart.status = true;
@@ -80,6 +98,23 @@ async function deleteOrder(req, res) {
         res.json({ msg: "Order Deleted Sucessfully" });
       });
     });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+async function setStatus(req, res) {
+  try {
+    let order = await Order.findById(req.params.id);
+    let status = parseInt(req.query.status) || parseInt(order.status) + 1;
+    if(status > 4){
+      status = 4;
+    }
+    order.status = status;
+
+    await Order.findByIdAndUpdate(req.params.id, order).then(()=>{
+      res.json({status: status, msg: "Status updated!"});
+    });
+    
   } catch (err) {
     res.status(500).json(err);
   }
@@ -126,7 +161,6 @@ async function invoice(req, res) {
     () => stream.end(),
     order
   );
-  // res.json(order);
 }
 
 function buildPDF(dataCallback, endCallback, data) {
@@ -273,6 +307,7 @@ async function Webhook(req, res) {
 module.exports = {
   getOrders,
   placeOrders,
+  setStatus,
   checkout,
   getOrderById,
   deleteOrder,

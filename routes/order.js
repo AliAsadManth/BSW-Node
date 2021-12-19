@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   getOrders,
   placeOrders,
+  setStatus,
   checkout,
   getOrderById,
   deleteOrder,
@@ -13,6 +14,7 @@ const {
 
 router.get("/", getOrders);
 router.get("/invoice/:id", invoice); //? id -> order id
+router.put("/status/:id", setStatus);//? id -> order id 
 router.post("/placeOrder/:id", placeOrders); //? id -> user id
 router.patch("/checkout", checkout);
 router.post(

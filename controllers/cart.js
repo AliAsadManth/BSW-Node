@@ -29,12 +29,14 @@ async function addToCart(req, res) {
           "product.productId"
         );
         res.status(200).json({ msg: "Product Added to Cart.", data });
+        return;
       } else {
         cart.product.push(req.body);
         let data = await Cart.findByIdAndUpdate(cart._id, cart).populate(
           "product.productId"
         );
         res.status(200).json({ msg: "Product Added to Cart.", data });
+        return;
       }
     } else {
       let cart = Cart({ userId: req.params.uid });
@@ -42,6 +44,7 @@ async function addToCart(req, res) {
       let data = await Cart.create(cart);
       data = await data.populate("product.productId");
       res.status(200).json({ msg: "Product Added to Cart.", data });
+      return;
     }
   } catch (err) {
     console.log(err.message);

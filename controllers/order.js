@@ -9,7 +9,7 @@ async function getOrders(req, res) {
   // TODO: Pagination...
   try {
     let page = req.query.page || 1;
-    let items_per_page = 12;
+    let items_per_page = 20;
     let order_count = await Order.countDocuments();
     let total_pages = Math.ceil(order_count / items_per_page);
     if (page > total_pages) {
@@ -295,7 +295,6 @@ async function Webhook(req, res) {
         });
         await Cart.findByIdAndUpdate(order.cartId, cart);
       });
-      /////////////////////////////
 
       break;
     }

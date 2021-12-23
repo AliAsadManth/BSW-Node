@@ -4,7 +4,7 @@ const Product = db.Product;
 async function getAllProducts(req, res) {
   try {
     let page = req.query.page || 1;
-    let items_per_page = 12;
+    let items_per_page = 20;
     let product_count = await Product.find({ status: true }).countDocuments();
     let total_pages = Math.ceil(product_count / items_per_page);
     if (page > total_pages) {
@@ -135,7 +135,7 @@ async function searchProducts(req, res) {
     if (req.query.q !== "") {
       const regex = new RegExp(req.query.q, "i");
       let page = req.query.page || 1;
-      let items_per_page = 12;
+      let items_per_page = 20;
       let product_count;
       let total_pages;
       let results;
@@ -148,16 +148,19 @@ async function searchProducts(req, res) {
         if (page > total_pages) {
           page = total_pages;
         }
-
         let search = await Product.find({
           mpn: { $regex: regex },
           status: true,
-        });
-
-        results = search.slice(
-          (page - 1) * items_per_page,
-          (page - 1) * items_per_page + items_per_page
-        );
+        })
+          .skip((page - 1) * items_per_page)
+          .limit(items_per_page).catch((e)=>{
+            if(e){
+              results = []; //! Getting error when results came null...
+            }
+          });
+          if(search){
+            results = search;
+          }
       } else {
         product_count = await Product.find({
           name: { $regex: regex },
@@ -170,12 +173,15 @@ async function searchProducts(req, res) {
         let search = await Product.find({
           name: { $regex: regex },
           status: true,
+        }).skip((page - 1) * items_per_page)
+        .limit(items_per_page).catch((e)=>{
+          if(e){
+            results = []; //! Getting error when results came null...
+          }
         });
-
-        results = search.slice(
-          (page - 1) * items_per_page,
-          (page - 1) * items_per_page + items_per_page
-        );
+        if(search){
+          results = search;
+        }
       }
       res.status(200).json({
         products: results,
@@ -239,7 +245,7 @@ async function getLatestProducts(req, res) {
 async function getByCategoryID(req, res) {
   try {
     let page = req.query.page || 1;
-    let items_per_page = 12;
+    let items_per_page = 20;
     let product_count = await Product.find({
       categoryId: req.params.cid,
       status: true,
@@ -259,7 +265,7 @@ async function getByCategoryID(req, res) {
       .limit(items_per_page)
       .catch((e) => {
         if (e) {
-          productsByCategoryID = [];
+          productsByCategoryID = []; //! Getting error when results came null...
         }
       });
     if (productsFound) {

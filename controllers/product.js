@@ -5,12 +5,12 @@ async function getAllProducts(req, res) {
   try {
     let page = req.query.page || 1;
     let items_per_page = 12;
-    let product_count = await Product.find({status: true}).countDocuments();
+    let product_count = await Product.find({ status: true }).countDocuments();
     let total_pages = Math.ceil(product_count / items_per_page);
     if (page > total_pages) {
       page = total_pages;
     }
-    let products = await Product.find({status: true})
+    let products = await Product.find({ status: true })
       .populate("categoryId", "name parentCategory")
       .sort({ _id: -1 })
       .skip((page - 1) * items_per_page)
@@ -219,9 +219,7 @@ async function featureProduct(req, res) {
 }
 async function getFeaturedProducts(req, res) {
   try {
-    let featuredProducts = await Product.find(
-      { featured: true, status: true }
-    );
+    let featuredProducts = await Product.find({ featured: true, status: true });
 
     res.status(200).json(featuredProducts);
   } catch (err) {
@@ -244,31 +242,40 @@ async function getByCategoryID(req, res) {
     let items_per_page = 12;
     let product_count = await Product.find({
       categoryId: req.params.cid,
-      status: true
+      status: true,
     }).countDocuments();
     let total_pages = Math.ceil(product_count / items_per_page);
     if (page > total_pages) {
       page = total_pages;
     }
-    let productsByCategoryID = await Product.find({
+    let productsByCategoryID = [];
+    let productsFound = await Product.find({
       categoryId: req.params.cid,
-      status: true
+      status: true,
     })
       .populate("categoryId", "name")
       .sort({ _id: -1 })
       .skip((page - 1) * items_per_page)
-      .limit(items_per_page);
-      res.status(200).json({
-        products: productsByCategoryID,
-        total_products: product_count,
-        total_pages: total_pages,
-        items_per_page: items_per_page,
-        current_page: parseInt(page),
-        has_next_page: page < total_pages,
-        has_previous_page: page > 1,
-        next_page: parseInt(page) + 1,
-        previous_page: page - 1,
+      .limit(items_per_page)
+      .catch((e) => {
+        if (e) {
+          productsByCategoryID = [];
+        }
       });
+    if (productsFound) {
+      productsByCategoryID = productsFound;
+    }
+    res.status(200).json({
+      products: productsByCategoryID,
+      total_products: product_count,
+      total_pages: total_pages,
+      items_per_page: items_per_page,
+      current_page: parseInt(page),
+      has_next_page: page < total_pages,
+      has_previous_page: page > 1,
+      next_page: parseInt(page) + 1,
+      previous_page: page - 1,
+    });
   } catch (err) {
     res.status(500).json(err);
   }

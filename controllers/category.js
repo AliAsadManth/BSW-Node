@@ -23,10 +23,11 @@ async function createCategory(req, res) {
 }
 async function deleteCategory(req, res) {
     try {
-        if(await SubCategory.findOne({parentCategory: req.params.id})){
+        let subcat = await SubCategory.findOne({parentCategory: req.params.id});
+        if(subcat){
             res.status(200).json({msg: "Delete Sub Categories First!"});
             return;
-        }else{
+        } else {
             await Category.findByIdAndDelete(req.params.id).then(() => {
                 res.status(200).json({msg: "Category Deleted!"});
             });
@@ -73,8 +74,10 @@ async function createSubCategory(req, res) {
 }
 async function deleteSubCategory(req, res) {
     try {
-      if (await Product.findOne({ categoryId: req.params.id })) {
+       let ProductChk = await Product.findOne({ categoryId: req.params.id });
+      if (ProductChk) {
         res.status(200).json({msg: "Delete Products in this category First!" });
+        return;
       } else {
         await SubCategory.findByIdAndDelete(req.params.id).then(() => {
           res.status(200).json({msg: "Category Deleted!" });

@@ -153,14 +153,15 @@ async function searchProducts(req, res) {
           status: true,
         })
           .skip((page - 1) * items_per_page)
-          .limit(items_per_page).catch((e)=>{
-            if(e){
+          .limit(items_per_page)
+          .catch((e) => {
+            if (e) {
               results = []; //! Getting error when results came null...
             }
           });
-          if(search){
-            results = search;
-          }
+        if (search) {
+          results = search;
+        }
       } else {
         product_count = await Product.find({
           name: { $regex: regex },
@@ -173,13 +174,15 @@ async function searchProducts(req, res) {
         let search = await Product.find({
           name: { $regex: regex },
           status: true,
-        }).skip((page - 1) * items_per_page)
-        .limit(items_per_page).catch((e)=>{
-          if(e){
-            results = []; //! Getting error when results came null...
-          }
-        });
-        if(search){
+        })
+          .skip((page - 1) * items_per_page)
+          .limit(items_per_page)
+          .catch((e) => {
+            if (e) {
+              results = []; //! Getting error when results came null...
+            }
+          });
+        if (search) {
           results = search;
         }
       }

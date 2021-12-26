@@ -5,30 +5,23 @@ async function dashboard(req, res) {
     y = date.getFullYear(),
     m = date.getMonth(),
     d = date.getDate();
-  var firstDay = new Date(y, m, 1);
-  var lastDay = new Date(y, m + 1, 0);
-  var today = new Date(y, m, d );
-  
+  var SixMonthBack = new Date(y, m - 5, 1); // -6 months
+  var firstDay = new Date(y, m, 1); // month
+  var lastDay = new Date(y, m + 1, 0); // month
+  var today = new Date(y, m, d - 1); //today
+
   //! Cards
   //? Total Signups in current month
   let signups = await db.User.countDocuments({
     createdAt: { $gte: firstDay, $lt: lastDay },
   });
-  
-  // !ON HOLD
-  // var firstDay_lm = new Date(y, m-1, 1);
-  // var lastDay_lm = new Date(y, m, 0);
-  // let signups_lm = await db.User.countDocuments({
-  //   createdAt: { $gte: firstDay_lm, $lt: lastDay_lm },
-  // });
-  //! ^
 
-  //? Total Products
+  //? pending Orders
   let pending_orders = await db.Order.countDocuments({
-    status: {$lte: 1}
+    status: { $lte: 0 },
   });
 
-  //? orders per day - Count
+  //? orders per day
   let orders_day = await db.Order.countDocuments({
     createdAt: { $gte: today },
   });
@@ -41,34 +34,53 @@ async function dashboard(req, res) {
     {
       $group: {
         _id: null,
-        "sales": {$sum: "$grandTotal"},
-      }
+        sales: { $sum: "$grandTotal" },
+      },
     },
   ]);
 
-  if(sales_day.length === 0){
+  if (sales_day.length === 0) {
     sales_day = 0;
   } else {
     sales_day = parseFloat(sales_day[0].sales.toFixed(2));
   }
-  // let sales_day_docs = await db.Order.find({createdAt: {$gte: today}});
-  // let sales_day = 0;
-  // sales_day_docs.forEach(sales => {
-  //     sales_day += sales.grandTotal;
-  // });
 
   //! Graphs - duration 6 month
   //? Sales per month
-  let sales_month = "await db.Order.find()";
+  let sales_month = await db.Order.aggregate([
+    {
+      $match: { createdAt: { $gte: SixMonthBack, $lt: lastDay } },
+    },
+    {
+      $group: {
+        _id: { month: { $month: "$createdAt" } },
+        sales: { $sum: "$grandTotal" },
+      },
+    },
+  ]);
+
+  //? Orders per month
+  let orders_month = await db.Order.aggregate([
+    {
+      $match: { createdAt: { $gte: SixMonthBack, $lt: lastDay } },
+    },
+    {
+      $group: {
+        _id: { month: { $month: "$createdAt" } },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
 
   res.json({
     //! Cards
     signups: signups,
-    orders_day: orders_day,
     pending_orders: pending_orders,
+    orders_day: orders_day,
     sales_day: sales_day,
     //! Graphs
     sales_month: sales_month,
+    orders_month: orders_month,
   });
 }
 

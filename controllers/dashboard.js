@@ -9,7 +9,20 @@ async function dashboard(req, res) {
   var firstDay = new Date(y, m, 1); // month
   var lastDay = new Date(y, m + 1, 0); // month
   var today = new Date(y, m, d - 1); //today
-
+  var months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   //! Cards
   //? Total Signups in current month
   let signups = await db.User.countDocuments({
@@ -58,6 +71,17 @@ async function dashboard(req, res) {
       },
     },
   ]);
+  sales_month.sort(function(a, b) {
+    return a._id.month - b._id.month;
+  });
+  let sales_month_names = {
+    month: [],
+    sales: []
+  };
+  sales_month.forEach((item) => {
+    sales_month_names.month.push(months[item._id.month - 1]);
+    sales_month_names.sales.push(item.sales);
+  });
 
   //? Orders per month
   let orders_month = await db.Order.aggregate([
@@ -71,7 +95,20 @@ async function dashboard(req, res) {
       },
     },
   ]);
+  orders_month.sort(function(a, b) {
+    return a._id.month - b._id.month;
+  });
+  let orders_month_names = {
+    month: [],
+    count: []
+  };
+  orders_month.forEach((item) => {
+    orders_month_names.month.push(months[item._id.month - 1]);
+    orders_month_names.count.push(item.count);
+  });
 
+  // orders_month_names.sort();
+  // console.log(orders_month_names);
   res.json({
     //! Cards
     signups: signups,
@@ -79,8 +116,8 @@ async function dashboard(req, res) {
     orders_day: orders_day,
     sales_day: sales_day,
     //! Graphs
-    sales_month: sales_month,
-    orders_month: orders_month,
+    sales_month: sales_month_names,
+    orders_month: orders_month_names,
   });
 }
 

@@ -14,9 +14,9 @@ const orderSchema = mongoose.Schema(
       ref: "cart",
     },
     status: {
-      //? 0 -> pending, 1-> processing, 2-> on its way, 3-> Delivered,
+      //? 0 -> pending, 1-> processing, 2-> on its way, 3-> Delivered, 4-> cancel order
       type: Number,
-      enum: [0, 1, 2, 3],
+      enum: [0, 1, 2, 3, 4],
       default: 0,
     },
     goodsTotal: {

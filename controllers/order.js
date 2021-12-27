@@ -92,12 +92,16 @@ async function placeOrders(req, res) {
 async function deleteOrder(req, res) {
   try {
     let order = await Order.findById(req.params.oid);
-    let cartId = order.cartId;
-    await Order.findByIdAndDelete(order._id).then(async () => {
-      await Cart.findByIdAndDelete(cartId).then(() => {
-        res.json({ msg: "Order Deleted Sucessfully" });
+    if(order.status === 4 || order.status === 3){
+      let cartId = order.cartId;
+      await Order.findByIdAndDelete(order._id).then(async () => {
+        await Cart.findByIdAndDelete(cartId).then(() => {
+          res.json({ msg: "Order Deleted Sucessfully" });
+        });
       });
-    });
+    } else {
+      res.json({ msg: "Order Cannot be Deleted" });
+    }
   } catch (err) {
     res.status(500).json(err);
   }
@@ -107,7 +111,7 @@ async function setStatus(req, res) {
     let order = await Order.findById(req.params.id);
     let status = parseInt(req.query.status) || parseInt(order.status) + 1;
     if(status > 4){
-      status = 4;
+      status = 3;
     }
     order.status = status;
 

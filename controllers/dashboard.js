@@ -5,25 +5,10 @@ async function dashboard(req, res) {
     y = date.getFullYear(),
     m = date.getMonth(),
     d = date.getDate();
-  var SixMonthBack = new Date(y, m - 5, 1); // -6 months
   var firstDay = new Date(y, m, 1); // month
   var lastDay = new Date(y, m + 1, 0); // month
-  var today = new Date(y, m, d - 1); //today
-  var months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  //! Cards
+  var today = new Date(y, m, d); //today
+
   //? Total Signups in current month
   let signups = await db.User.countDocuments({
     createdAt: { $gte: firstDay, $lt: lastDay },
@@ -58,8 +43,34 @@ async function dashboard(req, res) {
     sales_day = parseFloat(sales_day[0].sales.toFixed(2));
   }
 
-  //! Graphs - duration 6 month
-  //? Sales per month
+  res.json({
+    signups: signups,
+    pending_orders: pending_orders,
+    orders_day: orders_day,
+    sales_day: sales_day,
+  });
+}
+async function graph(req, res) {
+  var date = new Date(),
+    y = date.getFullYear(),
+    m = date.getMonth(),
+    d = date.getDate();
+  var SixMonthBack = new Date(y, m - 5, 1); // -6 months
+  var lastDay = new Date(y, m + 1, 0); // month
+  var months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   let sales_month = await db.Order.aggregate([
     {
       $match: { createdAt: { $gte: SixMonthBack, $lt: lastDay } },
@@ -71,16 +82,16 @@ async function dashboard(req, res) {
       },
     },
   ]);
-  sales_month.sort(function(a, b) {
+  sales_month.sort(function (a, b) {
     return a._id.month - b._id.month;
   });
   let sales_month_names = {
     month: [],
-    sales: []
+    sales: [],
   };
   sales_month.forEach((item) => {
     sales_month_names.month.push(months[item._id.month - 1]);
-    sales_month_names.sales.push(item.sales);
+    sales_month_names.sales.push(parseFloat((item.sales / 1000).toFixed(2)));
   });
 
   //? Orders per month
@@ -95,32 +106,23 @@ async function dashboard(req, res) {
       },
     },
   ]);
-  orders_month.sort(function(a, b) {
+  orders_month.sort(function (a, b) {
     return a._id.month - b._id.month;
   });
   let orders_month_names = {
     month: [],
-    count: []
+    count: [],
   };
   orders_month.forEach((item) => {
     orders_month_names.month.push(months[item._id.month - 1]);
     orders_month_names.count.push(item.count);
   });
 
-  // orders_month_names.sort();
-  // console.log(orders_month_names);
   res.json({
-    //! Cards
-    signups: signups,
-    pending_orders: pending_orders,
-    orders_day: orders_day,
-    sales_day: sales_day,
-    //! Graphs
     sales_month: sales_month_names,
     orders_month: orders_month_names,
   });
 }
-
 async function setTax(req, res) {
   let doc_count = await db.Tax.count();
   if (doc_count === 1) {
@@ -141,6 +143,7 @@ async function getTax(req, res) {
 
 module.exports = {
   dashboard,
+  graph,
   setTax,
   getTax,
 };

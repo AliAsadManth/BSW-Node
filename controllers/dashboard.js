@@ -77,13 +77,16 @@ async function graph(req, res) {
     },
     {
       $group: {
-        _id: { month: { $month: "$createdAt" } },
+        _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
         sales: { $sum: "$grandTotal" },
       },
     },
   ]);
   sales_month.sort(function (a, b) {
     return a._id.month - b._id.month;
+  });
+  sales_month.sort(function (a, b) {
+    return a._id.year - b._id.year;
   });
   let sales_month_names = {
     month: [],
@@ -101,13 +104,16 @@ async function graph(req, res) {
     },
     {
       $group: {
-        _id: { month: { $month: "$createdAt" } },
+        _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
         count: { $sum: 1 },
       },
     },
   ]);
   orders_month.sort(function (a, b) {
     return a._id.month - b._id.month;
+  });
+  orders_month.sort(function (a, b) {
+    return a._id.year - b._id.year;
   });
   let orders_month_names = {
     month: [],

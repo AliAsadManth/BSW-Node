@@ -184,16 +184,10 @@ async function updateUser(req, res) {
 
     users.forEach((singleUser) => {
       if (singleUser.phone_no === "+61" + body.phone_no) {
-        res.json({ phoneErr: "Phone Number Already exist" });
+        res.json({ err: "Phone Number Already exist" });
         return;
       }
     });
-    if (body.phone_no.length !== 9) {
-      res.json({
-        phoneErr: "Wrong Phone Number Format, Phone number must be 9 digits.",
-      });
-      return;
-    }
     body.phone_no = "+61" + body.phone_no;
     // * if phone number did't exist...
     await User.findByIdAndUpdate(req.params.id, body).then(() => {
@@ -217,7 +211,7 @@ async function updatePassword(req, res) {
             function (err, result) {
               if (result) {
                 res.json({
-                  passErr: "New password cannot be same as Old Password!",
+                  err: "New password cannot be same as Old Password!",
                 });
                 return;
               } else {
@@ -231,11 +225,11 @@ async function updatePassword(req, res) {
             }
           );
         } else {
-          res.json({ passErr: "Please Confirm your Password!" });
+          res.json({ err: "Please Confirm your Password!" });
           return;
         }
       } else {
-        res.json({ passErr: "Password didn't match!" });
+        res.json({ err: "Password didn't match!" });
         return;
       }
     });

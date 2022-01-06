@@ -57,7 +57,9 @@ async function createUser(req, res) {
       otp += chars.substring(randomNumber, randomNumber + 1);
     }
     userObj.otp = otp;
-    userObj.phone_no = "+61" + body.phone_no;
+    if(body.phone_no !== undefined){
+      userObj.phone_no = "+61" + body.phone_no;
+    }
     userObj.password = bcrypt.hashSync(body.password, 10);
 
     await User.create(userObj).then((createdUser) => {

@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
-
+const fs = require("fs");
 const {
   getAllProducts,
   addProduct,
@@ -17,13 +17,25 @@ const {
 } = require("../controllers/product");
 
 //? Image Storage
+const uploads_folder = "./uploads";
+const img_folder = uploads_folder+"/images";
+const pdf_folder = uploads_folder+"/pdf";
+if (!fs.existsSync(uploads_folder)) {
+  fs.mkdirSync(uploads_folder);
+}
+if (!fs.existsSync(img_folder)) {
+  fs.mkdirSync(img_folder);
+}
+if (!fs.existsSync(pdf_folder)) {
+  fs.mkdirSync(pdf_folder);
+}
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     if (file.fieldname === "image") {
-      cb(null, "./Uploads/images");
+      cb(null, img_folder);
     } else if (file.fieldname === "pdf") {
       if (file.mimetype === "application/pdf") {
-        cb(null, "./Uploads/pdf");
+        cb(null, pdf_folder);
       } else {
         cb(new Error("Invalid PDF File!"));
       }

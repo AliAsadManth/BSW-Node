@@ -430,7 +430,7 @@ async function login(req, res, next) {
     passport.authenticate("local", (err, user) => {
       if (err) throw err;
 
-      if (!user) {
+      if (!user || user.role === "admin" || user.status === false) {
         res.send("Invalid email or password");
       } else {
         req.logIn(user, (err) => {
@@ -443,6 +443,26 @@ async function login(req, res, next) {
     res.status(500).json(err);
   }
 }
+
+async function adminLogin(req, res, next) {
+  try {
+    passport.authenticate("local", (err, user) => {
+      if (err) throw err;
+
+      if (!user || user.role !== "admin" || user.status === false) {
+        res.send("Invalid email or password");
+      } else {
+        req.logIn(user, (err) => {
+          if (err) throw err;
+          res.send(user);
+        });
+      }
+    })(req, res, next);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
+
 async function loggedIn(req, res) {
   res.json({ status: 200, user: req.user });
 }
@@ -516,4 +536,5 @@ module.exports = {
   createGuest,
   guestLoggedin,
   guestLogout,
+  adminLogin,
 };

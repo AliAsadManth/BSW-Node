@@ -5,8 +5,27 @@ const Product = db.Product;
 
 //? Category Methods
 async function getAllCategory(req, res) {
-  const categories = await Category.find();
-  res.json(categories);
+  let page = req.query.page || 1;
+  let items_per_page = 12;
+  let category_count = await Category.countDocuments();
+  let total_pages = Math.ceil(category_count / items_per_page);
+  if (page > total_pages) {
+    page = total_pages;
+  }
+  let categories = await Category.find()
+    .skip((page - 1) * items_per_page)
+    .limit(items_per_page);
+  res.json({
+    categories: categories,
+    total_category: category_count,
+    total_pages: total_pages,
+    items_per_page: items_per_page,
+    current_page: parseInt(page),
+    has_next_page: page < total_pages,
+    has_previous_page: page > 1,
+    next_page: parseInt(page) + 1,
+    previous_page: page - 1,
+  });
 }
 async function createCategory(req, res) {
   try {
@@ -56,11 +75,28 @@ async function getCategoryById(req, res) {
 
 //? Sub Category Methods
 async function getAllSubCategory(req, res) {
-  const subCategories = await SubCategory.find().populate(
-    "parentCategory",
-    "name parentCategory"
-  );
-  res.json(subCategories);
+  let page = req.query.page || 1;
+  let items_per_page = 12;
+  let category_count = await SubCategory.countDocuments();
+  let total_pages = Math.ceil(category_count / items_per_page);
+  if (page > total_pages) {
+    page = total_pages;
+  }
+  const subCategories = await SubCategory.find()
+    .populate("parentCategory", "name parentCategory")
+    .skip((page - 1) * items_per_page)
+    .limit(items_per_page);
+  res.json({
+    categories: subCategories,
+    total_category: category_count,
+    total_pages: total_pages,
+    items_per_page: items_per_page,
+    current_page: parseInt(page),
+    has_next_page: page < total_pages,
+    has_previous_page: page > 1,
+    next_page: parseInt(page) + 1,
+    previous_page: page - 1,
+  });
 }
 async function createSubCategory(req, res) {
   try {

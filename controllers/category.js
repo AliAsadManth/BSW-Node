@@ -98,6 +98,14 @@ async function getAllSubCategory(req, res) {
     previous_page: page - 1,
   });
 }
+async function productSubCat(req, res) {
+  try {
+    const subCategories = await SubCategory.find();
+    res.json(subCategories);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
 async function createSubCategory(req, res) {
   try {
     if (req.body.parentCategory === undefined) {
@@ -157,4 +165,6 @@ module.exports = {
   deleteSubCategory,
   updateSubCategory,
   getSubcategoryById,
+
+  productSubCat
 };

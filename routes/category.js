@@ -13,10 +13,13 @@ const {
     deleteSubCategory,
     updateSubCategory,
     getSubcategoryById,
+
+    productSubCat
 } = require("../controllers/category");
 
 //? Sub category
 router.get("/subcategory", getAllSubCategory);
+router.get("/subcategory/product", productSubCat);
 router.post("/subcategory/create", createSubCategory);
 router.get("/subcategory/:id", getSubcategoryById);
 router.delete("/subcategory/:id/delete", deleteSubCategory);

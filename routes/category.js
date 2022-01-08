@@ -14,7 +14,8 @@ const {
     updateSubCategory,
     getSubcategoryById,
 
-    productSubCat
+    productSubCat,
+    getCat
 } = require("../controllers/category");
 
 //? Sub category
@@ -27,6 +28,7 @@ router.put("/subcategory/:id/update", updateSubCategory);
 
 //? Parent Category
 router.get("/", getAllCategory);
+router.get("/all", getCat);
 router.post("/create", createCategory);
 router.get("/:id", getCategoryById);
 router.delete("/:id/delete", deleteCategory);

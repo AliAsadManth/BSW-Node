@@ -72,7 +72,14 @@ async function getCategoryById(req, res) {
     res.status(500).json(err);
   }
 }
-
+async function getCat(req, res) {
+  try {
+    const categories = await Category.find();
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+}
 //? Sub Category Methods
 async function getAllSubCategory(req, res) {
   let page = req.query.page || 1;
@@ -166,5 +173,6 @@ module.exports = {
   updateSubCategory,
   getSubcategoryById,
 
-  productSubCat
+  productSubCat,
+  getCat
 };

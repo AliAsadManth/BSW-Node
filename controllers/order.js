@@ -264,7 +264,7 @@ async function Webhook(req, res) {
     event = stripe.webhooks.constructEvent(
       req.rawBody,
       sig,
-      "whsec_ye98XrIHsI6XUAfmRTkLKZvdOkFMBduq" //////webhook scret key
+      "we_1KG5ZkFqKDg6ob5UPVUkV4e1" //////webhook scret key
     );
   } catch (error) {
     res.status(400).send(`Webhook Error: ${err.message}`);

@@ -12,7 +12,7 @@ require("./middlewares/common")(app);
 require("./utils/db");
 
 //? Routes
-app.use("/", require("./routes/index"));
+app.use("/", require("./routes/routes"));
 
 //! Static Image and Slider folders
 app.use("/uploads/images", express.static("./Uploads/images"));

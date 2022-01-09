@@ -19,12 +19,5 @@ app.use("/uploads/images", express.static("./Uploads/images"));
 app.use("/uploads/pdf", express.static("./Uploads/pdf"));
 app.use("/uploads/sliders", express.static("./Uploads/sliders"));
 
-//? Test Route
-app.use("/", (req, res) => {
-  res.send(
-    `<script>window.location.href='${process.env.RETURN_URL}';</script>`
-  );
-});
-
 //? listening to server
 app.listen(port, () => console.log("Server is running on port: " + port));

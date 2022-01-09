@@ -107,7 +107,7 @@ async function getAllSubCategory(req, res) {
 }
 async function productSubCat(req, res) {
   try {
-    const subCategories = await SubCategory.find();
+    const subCategories = await SubCategory.find().populate("parentCategory", "name parentCategory");
     res.json(subCategories);
   } catch (err) {
     res.status(500).json(err);

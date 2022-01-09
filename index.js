@@ -15,7 +15,7 @@ require("./utils/db");
 app.use("/", require("./routes/routes"));
 
 //! Static Image and Slider folders
-app.use(express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(__dirname, './uploads')));
 // app.use("/uploads/images", express.static("./Uploads/images"));
 // app.use("/uploads/pdf", express.static("./Uploads/pdf"));
 // app.use("/uploads/sliders", express.static("./Uploads/sliders"));

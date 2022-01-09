@@ -34,12 +34,11 @@ async function createUser(req, res) {
       return;
     }
     let phone = await User.countDocuments({ phone_no: "+61" + body.phone_no });
-    // if (body.phone_no.length !== 9) {
-    // 	res.json({
-    // 		err: "Wrong Phone Number Format, Phone number must be 9 digits.",
-    // 	});
-    // 	return;
-    // }
+    if (body.phone_no.length !== 9) {
+      return res.json({
+        err: "Phone number must be 9 digits.",
+      });
+    }
     if (phone !== 0) {
       res.json({ err: "Phone Number Already exist" });
       return;
@@ -175,22 +174,31 @@ async function createUser(req, res) {
 }
 //! Update all info insted Password here...
 async function updateUser(req, res) {
-  let body = req.body;
   try {
-    //? All users expet this to check email emails and pass
-    let users = await User.find({ _id: { $ne: req.params.id } });
-
-    // ? Current user
-    // let currentUser = await User.findById(req.params.id);
-
+    let body = req.body;
     if (body.phone_no !== undefined) {
-      users.forEach((singleUser) => {
-        if (singleUser.phone_no === "+61" + body.phone_no) {
-          res.json({ err: "Phone Number Already exist" });
-          return;
+      if(body.phone_no.length === 9){
+        let phone_chk = await User.countDocuments({
+          _id: { $ne: req.params.id },
+          phone_no: "+61" + body.phone_no,
+        });
+        if (phone_chk !== 0) {
+          return res.json({ err: "Phone Number Already exist" });
+        } else {
+          body.phone_no = "+61" + body.phone_no;
         }
+      } else {
+        return res.json({ err: "Phone Number must be 9 digits" });
+      } 
+    }
+    if (body.email !== undefined) {
+      let email_chk = await User.countDocuments({
+        _id: { $ne: req.params.id },
+        email: body.email,
       });
-      body.phone_no = "+61" + body.phone_no;
+      if (email_chk !== 0) {
+        return res.json({ err: "Email Already exist" });
+      }
     }
     // * if phone number did't exist...
     await User.findByIdAndUpdate(req.params.id, body).then(() => {

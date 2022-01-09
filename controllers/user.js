@@ -57,14 +57,13 @@ async function createUser(req, res) {
       otp += chars.substring(randomNumber, randomNumber + 1);
     }
     userObj.otp = otp;
-    if(body.phone_no !== undefined){
+    if (body.phone_no !== undefined) {
       userObj.phone_no = "+61" + body.phone_no;
     }
     userObj.password = bcrypt.hashSync(body.password, 10);
 
     await User.create(userObj).then((createdUser) => {
-      let hostName = `${req.protocol}://${req.headers.host}`;
-      let verificationUrl = `${hostName}/api/user/userverification/${createdUser._id}/${otp}?via_email=true`;
+      let verificationUrl = `${process.env.RETURN_URL}/api/user/userverification/${createdUser._id}/${otp}?via_email=true`;
 
       var transporter = nodemailer.createTransport({
         service: "gmail",
@@ -184,13 +183,15 @@ async function updateUser(req, res) {
     // ? Current user
     // let currentUser = await User.findById(req.params.id);
 
-    users.forEach((singleUser) => {
-      if (singleUser.phone_no === "+61" + body.phone_no) {
-        res.json({ err: "Phone Number Already exist" });
-        return;
-      }
-    });
-    body.phone_no = "+61" + body.phone_no;
+    if (body.phone_no !== undefined) {
+      users.forEach((singleUser) => {
+        if (singleUser.phone_no === "+61" + body.phone_no) {
+          res.json({ err: "Phone Number Already exist" });
+          return;
+        }
+      });
+      body.phone_no = "+61" + body.phone_no;
+    }
     // * if phone number did't exist...
     await User.findByIdAndUpdate(req.params.id, body).then(() => {
       res.status(200).json({ msg: "User updated Sucessfully!" });

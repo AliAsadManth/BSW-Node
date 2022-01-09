@@ -22,7 +22,7 @@ app.use("/uploads/sliders", express.static("./Uploads/sliders"));
 //? Test Route
 app.use("/", (req, res) => {
   res.send(
-    "<center><h1 style='color:Tomato; font-size: 100;'>Main Page!</h1></center>"
+    `<script>window.location.href='${process.env.RETURN_URL}';</script>`
   );
 });
 

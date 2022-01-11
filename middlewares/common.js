@@ -12,7 +12,7 @@ module.exports = (app) => {
       limit: "50mb",
       verify: function (req, res, buf) {
         var url = req.originalUrl;
-        if (url.startsWith("/api/order/stripe/webhook")) {
+        if (url.startsWith("/order/stripe/webhook")) {
           req.rawBody = buf.toString();
         }
       },

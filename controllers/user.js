@@ -30,7 +30,7 @@ async function createUser(req, res) {
   try {
     let email = await User.countDocuments({ email: body.email, role: "user" });
     if (email !== 0) {
-      res.json({ err: "Email Already exist" });
+      res.json({ err: "User already exists on this email!" });
       return;
     }
     let phone = await User.countDocuments({
@@ -43,7 +43,7 @@ async function createUser(req, res) {
       });
     }
     if (phone !== 0) {
-      res.json({ err: "Phone Number Already exist" });
+      res.json({ err: "User already exists on this phone number!" });
       return;
     }
     let userObj = new User(body);

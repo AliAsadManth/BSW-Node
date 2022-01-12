@@ -28,12 +28,15 @@ async function createUser(req, res) {
   var otp = "";
   let body = req.body;
   try {
-    let email = await User.countDocuments({ email: body.email });
+    let email = await User.countDocuments({ email: body.email, role: "user" });
     if (email !== 0) {
       res.json({ err: "Email Already exist" });
       return;
     }
-    let phone = await User.countDocuments({ phone_no: "+61" + body.phone_no });
+    let phone = await User.countDocuments({
+      phone_no: "+61" + body.phone_no,
+      role: "user",
+    });
     if (body.phone_no.length !== 9) {
       return res.json({
         err: "Phone number must be 9 digits.",
@@ -177,10 +180,11 @@ async function updateUser(req, res) {
   try {
     let body = req.body;
     if (body.phone_no !== undefined) {
-      if(body.phone_no.length === 9){
+      if (body.phone_no.length === 9) {
         let phone_chk = await User.countDocuments({
           _id: { $ne: req.params.id },
           phone_no: "+61" + body.phone_no,
+          role: "user",
         });
         if (phone_chk !== 0) {
           return res.json({ err: "Phone Number Already exist" });
@@ -189,12 +193,13 @@ async function updateUser(req, res) {
         }
       } else {
         return res.json({ err: "Phone Number must be 9 digits" });
-      } 
+      }
     }
     if (body.email !== undefined) {
       let email_chk = await User.countDocuments({
         _id: { $ne: req.params.id },
         email: body.email,
+        role: "user",
       });
       if (email_chk !== 0) {
         return res.json({ err: "Email Already exist" });
@@ -250,7 +255,7 @@ async function updatePassword(req, res) {
 }
 async function forgetPassword(req, res) {
   try {
-    let userObj = await User.findOne({ email: req.body.email });
+    let userObj = await User.findOne({ email: req.body.email, role: "user" });
     if (userObj === null) {
       res.status(404).json({ err: "User not found!" });
       return;
@@ -489,14 +494,10 @@ async function logout(req, res) {
 
 async function createGuest(req, res) {
   try {
-    const checkEmail = await User.findOne({
+    const checkUser = await User.findOne({
       email: req.body.email,
+      role: "guest",
     });
-    const checkPhone = await User.findOne({
-      phone_no: "+61" + req.body.phone,
-    });
-    if (checkEmail) throw "User already exist with this email!";
-    if (checkPhone) throw "User already exist with this phone number!";
     const data = {
       name: req.body.name,
       email: req.body.email,
@@ -505,8 +506,13 @@ async function createGuest(req, res) {
       role: "guest",
       status: true,
     };
-    const user = await User.create(data);
-    req.session.guestUser = user;
+    let user = new User();
+    if (checkUser) {
+      user = await User.findByIdAndUpdate(checkUser._id, data);
+    } else {
+      user = await User.create(data);
+    }
+    req.session.guestUser = await User.findById(user._id);
     res.json({
       status: 200,
       message: "Guest user successfully created!",

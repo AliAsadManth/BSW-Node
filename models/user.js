@@ -8,8 +8,8 @@ const userSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      unique: true,
       required: true,
+      unique: false,
       trim: true,
     },
     password: {
@@ -38,7 +38,7 @@ const userSchema = mongoose.Schema(
     phone_no: {
       type: String,
       require: true,
-      unique: true,
+      unique: false,
     },
   },
   { timestamps: true }

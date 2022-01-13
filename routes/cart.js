@@ -9,11 +9,11 @@ const {
 } = require("../controllers/cart");
 
 // ? id => product id, uid => user id
-router.get("/:uid", getCart);
 router.post("/add/:uid", addToCart);
 router.delete("/remove/:id/:uid", removeFromCart);
 router.put("/increment/:id/:uid", increment);
 router.put("/decrement/:id/:uid", decrement);
+router.get("/:uid", getCart);
 
 
 module.exports = router;

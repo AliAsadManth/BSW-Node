@@ -26,7 +26,6 @@ const {
 //TODO: User Routes
 router.get("/", getAllUsers);
 router.get("/contact", contactUs);
-router.get("/:id", getUserById);
 router.post("/create", createUser);
 router.put("/update/:id", updateUser);
 router.put("/forgetpassword", forgetPassword);
@@ -40,5 +39,6 @@ router.delete("/logout", logout);
 router.post("/createguest", createGuest);
 router.patch("/guestloggedin", checkGuest, guestLoggedin); //! not working with get
 router.delete("/guestLogout", guestLogout);
+router.get("/:id", getUserById);
 
 module.exports = router;

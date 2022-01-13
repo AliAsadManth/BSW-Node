@@ -22,7 +22,7 @@ router.post(
   express.raw({ type: "application/json" }),
   Webhook
 );
-router.get("/:id", getOrderById); //? id -> user id
 router.delete("/deleteOrder/:oid", deleteOrder); //? oid -> order id
+router.get("/:id", getOrderById); //? id -> user id
 
 module.exports = router;

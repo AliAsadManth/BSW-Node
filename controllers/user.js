@@ -37,9 +37,9 @@ async function createUser(req, res) {
       phone_no: "+61" + body.phone_no,
       role: "user",
     });
-    if (body.phone_no.length !== 9) {
+    if (body.phone_no.length !== 10) {
       return res.json({
-        err: "Phone number must be 9 digits.",
+        err: "Phone number must be 10 digits.",
       });
     }
     if (phone !== 0) {
@@ -180,7 +180,7 @@ async function updateUser(req, res) {
   try {
     let body = req.body;
     if (body.phone_no !== undefined) {
-      if (body.phone_no.length === 9) {
+      if (body.phone_no.length === 10) {
         let phone_chk = await User.countDocuments({
           _id: { $ne: req.params.id },
           phone_no: "+61" + body.phone_no,
@@ -192,7 +192,7 @@ async function updateUser(req, res) {
           body.phone_no = "+61" + body.phone_no;
         }
       } else {
-        return res.json({ err: "Phone Number must be 9 digits" });
+        return res.json({ err: "Phone Number must be 10 digits" });
       }
     }
     if (body.email !== undefined) {

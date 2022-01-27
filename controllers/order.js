@@ -4,6 +4,7 @@ const Cart = db.Cart;
 const Product = db.Product;
 const stripe = require("stripe")(process.env.STRIPE_URI);
 const PDFDocument = require("pdfkit");
+const nodemailer = require("nodemailer");
 
 async function getOrders(req, res) {
   // TODO: Pagination...
@@ -71,6 +72,9 @@ async function placeOrders(req, res) {
     }
 
     await Order.create(order).then(async () => {
+      sendCustomerEmail(order).catch((err) => {
+        console.log("Error ----> ", err);
+      });
       let cart = await Cart.findById(order.cartId);
       cart.status = true;
       cart.orderId = order._id;
@@ -92,7 +96,7 @@ async function placeOrders(req, res) {
 async function deleteOrder(req, res) {
   try {
     let order = await Order.findById(req.params.oid);
-    if(order.status === 4 || order.status === 3){
+    if (order.status === 4 || order.status === 3) {
       let cartId = order.cartId;
       await Order.findByIdAndDelete(order._id).then(async () => {
         await Cart.findByIdAndDelete(cartId).then(() => {
@@ -110,15 +114,14 @@ async function setStatus(req, res) {
   try {
     let order = await Order.findById(req.params.id);
     let status = parseInt(req.query.status) || parseInt(order.status) + 1;
-    if(status > 4){
+    if (status > 4) {
       status = 3;
     }
     order.status = status;
 
-    await Order.findByIdAndUpdate(req.params.id, order).then(()=>{
-      res.json({status: status, msg: "Status updated!"});
+    await Order.findByIdAndUpdate(req.params.id, order).then(() => {
+      res.json({ status: status, msg: "Status updated!" });
     });
-    
   } catch (err) {
     res.status(500).json(err);
   }
@@ -257,6 +260,174 @@ function buildPDF(dataCallback, endCallback, data) {
   doc.end();
 }
 
+function sendCustomerEmail(orderObj) {
+  let html = `
+  <body style="margin: 0; padding: 0">
+    <table role="presentation" style="
+              width: 100%;
+              border-collapse: collapse;
+              border: 0;
+              border-spacing: 0;
+              background: #ffffff;
+            ">
+        <tr>
+            <td align="center" style="padding: 0">
+                <table role="presentation" style="
+                    width: 602px;
+                    border-collapse: collapse;
+                    border: 1px solid #cccccc;
+                    border-spacing: 0;
+                    text-align: left;
+                  ">
+                    <tr>
+                        <td align="center" style="padding: 20px 5px 10px 5px; background: rgb(255, 255, 255)">
+                            <img src="https://bswengineering.com/assets/bsw-logo-small.png" alt="" width="150"
+                                style="height: auto; display: block" />
+                            <h2 style="font-family: Gadugi">Thanks for Shoping, <b style="color: rgb(255, 0, 0);">${orderObj.name}</b>.</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        <div style="height: 1px; background-color: #ee4c50;"/>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding: 20px 10px 20px 10px;background: rgba(255, 255, 255, 0.651);">
+                            <h3 style="font-family: Monospace; font-size: 25px;">
+                                Your order has been placed sucessfully.
+                            </h3>
+                            <h3 style="font-family: Monospace; font-size: 20px;">
+                                Your Invoice number is <b style="color: rgb(255, 0, 0);">${orderObj.invoiceNo}</b>.
+                            </h3>
+                            <h3 style="font-family: Monospace; font-size: 15px;">
+                                <a style="color: rgb(255, 0, 0); font-family: Helvetica;" href="https://bswengineering.com/api/order/invoice/${orderObj._id}" target="_blank">Visit this link</a> for invoice/further information about your order.
+                            </h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 10px 10px 10px; background: #ee4c50">
+                            <p style="color: white; font-family: Helvetica;">Address: 21 Darlot road, Landsdale, WA 6065</p>
+                            <p style="color: white; font-family: Helvetica;">
+                                Call: 
+                                <a style="color: white; font-family: Helvetica;" href="tel:+610862050609">+61 (08) 62050609</a>
+                            </p>
+                            <p style="color: white; font-family: Helvetica;">Email:
+                                <a style="color: white; font-family: Helvetica;" href="mailto:sales@bswengineering.com">sales@bswengineering.com</a>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p align="center" style="color: #6b6b6b; font-family: Helvetica;">This email is generated automatically please do not reply.</p>
+                      </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+  `;
+  let htmlAdmin = `
+  <body style="margin: 0; padding: 0">
+    <table role="presentation" style="
+              width: 100%;
+              border-collapse: collapse;
+              border: 0;
+              border-spacing: 0;
+              background: #ffffff;
+            ">
+        <tr>
+            <td align="center" style="padding: 0">
+                <table role="presentation" style="
+                    width: 602px;
+                    border-collapse: collapse;
+                    border: 1px solid #cccccc;
+                    border-spacing: 0;
+                    text-align: left;
+                  ">
+                    <tr>
+                        <td align="center" style="padding: 20px 5px 10px 5px; background: rgb(255, 255, 255)">
+                            <img src="https://bswengineering.com/assets/bsw-logo-small.png" alt="" width="150"
+                                style="height: auto; display: block" />
+                            <h2 style="font-family: Gadugi">Order placed by, <b style="color: rgb(255, 0, 0);">${orderObj.name}</b>.</h2>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                        <div style="height: 1px; background-color: #ee4c50;"/>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="padding: 20px 10px 20px 10px;background: rgba(255, 255, 255, 0.651);">
+                            <h3 style="font-family: Monospace; font-size: 25px;">
+                                A new order by is placed by <b style="color: rgb(255, 0, 0);">${orderObj.name}</b>, under invoice number  <b style="color: rgb(255, 0, 0);">${orderObj.invoiceNo}</b>.
+                            </h3>
+                            <h3 style="font-family: Monospace; font-size: 15px;">
+                                <a style="color: rgb(255, 0, 0); font-family: Helvetica;" href="https://bswengineering.com/api/order/invoice/${orderObj._id}" target="_blank">Visit this link</a> for invoice/further information about order.
+                            </h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px 10px 10px 10px; background: #ee4c50">
+                            <p style="color: white; font-family: Helvetica;">Address: 21 Darlot road, Landsdale, WA 6065</p>
+                            <p style="color: white; font-family: Helvetica;">
+                                Call: 
+                                <a style="color: white; font-family: Helvetica;" href="tel:+610862050609">+61 (08) 62050609</a>
+                            </p>
+                            <p style="color: white; font-family: Helvetica;">Email:
+                                <a style="color: white; font-family: Helvetica;" href="mailto:sales@bswengineering.com">sales@bswengineering.com</a>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <p align="center" style="color: #6b6b6b; font-family: Helvetica;">This email is generated automatically please do not reply.</p>
+                      </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+  `;
+  return new Promise((resolve, reject) => {
+    var transporter = nodemailer.createTransport({
+      service: "gmail",
+      port: "465",
+      secure: true,
+      auth: {
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    var mailOptions = {
+      from: process.env.EMAIL,
+      to: orderObj.email,
+      subject: "Order Placed Sucessfully",
+      text: "This email is generated automatically please do not reply",
+      html: html,
+    };
+    var mailOptionsAdmin = {
+      from: process.env.EMAIL,
+      to: process.env.SALES_EMAIL,
+      subject: "Order Recieved",
+      text: "This email is generated automatically please do not reply",
+      html: htmlAdmin,
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (!error) {
+        transporter.sendMail(mailOptionsAdmin, function (error, info) {
+          if (error) {
+            reject(error);
+          } else {
+            resolve({ success: true, message: "Order Placed successfully" });
+          }
+        });
+      }
+    });
+  });
+}
+
 async function Webhook(req, res) {
   let sig = req.headers["stripe-signature"];
   let event;
@@ -287,6 +458,9 @@ async function Webhook(req, res) {
       }
 
       await Order.create(order).then(async () => {
+        sendCustomerEmail(order).catch((err) => {
+          console.log("Error ----> ", err);
+        });
         let cart = await Cart.findById(order.cartId);
         cart.status = true;
         cart.orderId = order._id;

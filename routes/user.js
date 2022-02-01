@@ -21,6 +21,7 @@ const {
   guestLoggedin,
   guestLogout,
   adminLogin,
+  createAdmin
 } = require("../controllers/user");
 
 //TODO: User Routes
@@ -37,6 +38,7 @@ router.patch("/loggedin", checkAuth, loggedIn); //! not working with get
 router.patch("/admin/loggedin", checkAdmin, loggedIn); //! not working with get
 router.delete("/logout", logout);
 router.post("/createguest", createGuest);
+router.post("/createadmin", createAdmin);
 router.patch("/guestloggedin", checkGuest, guestLoggedin); //! not working with get
 router.delete("/guestLogout", guestLogout);
 router.get("/:id", getUserById);

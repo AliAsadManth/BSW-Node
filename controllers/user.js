@@ -492,6 +492,33 @@ async function logout(req, res) {
   }
 }
 
+async function createAdmin(req, res) {
+  try {
+    const dbUser = await User.find({ role: "admin" });
+    if (dbUser.length === 0) {
+      let user = new User({
+        name: "Admin",
+        email: "admin@bswengineering.com",
+        password: bcrypt.hashSync("admin123", 10),
+        address: "Australia",
+        status: true,
+        role: "admin",
+      });
+      user.save((err, result) => {
+        if (err) {
+          res.json(err);
+        } else {
+          res.json(result);
+        }
+      });
+    } else {
+      throw dbUser;
+    }
+  } catch (err) {
+    res.status(500).json({ admin: err });
+  }
+}
+
 async function createGuest(req, res) {
   try {
     const checkUser = await User.findOne({
@@ -554,4 +581,5 @@ module.exports = {
   guestLoggedin,
   guestLogout,
   adminLogin,
+  createAdmin,
 };

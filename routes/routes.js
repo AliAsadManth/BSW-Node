@@ -9,6 +9,5 @@ router.use("/cart", require("./cart"));
 router.use("/slider", require("./slider"));
 router.use("/dashboard", require("./dashboard"));
 router.use("/order", require("./order"));
-
 // Export
 module.exports = router;

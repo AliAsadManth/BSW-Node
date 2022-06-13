@@ -2,20 +2,20 @@ const express = require("express");
 const router = express.Router();
 
 const {
-    getAllCategory,
-    createCategory,
-    deleteCategory,
-    updateCategory,
-    getCategoryById,
+  getAllCategory,
+  createCategory,
+  deleteCategory,
+  updateCategory,
+  getCategoryById,
 
-    createSubCategory,
-    getAllSubCategory,
-    deleteSubCategory,
-    updateSubCategory,
-    getSubcategoryById,
+  createSubCategory,
+  getAllSubCategory,
+  deleteSubCategory,
+  updateSubCategory,
+  getSubcategoryById,
 
-    productSubCat,
-    getCat
+  productSubCat,
+  getCat,
 } = require("../controllers/category");
 
 //? Sub category

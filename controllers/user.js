@@ -23,6 +23,7 @@ async function getUserById(req, res) {
   }
 }
 async function createUser(req, res) {
+  console.log(req.body, "req");
   var chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   var otpLength = 15;
   var otp = "";
@@ -172,6 +173,7 @@ async function createUser(req, res) {
       );
     });
   } catch (err) {
+    console.log("err--->", err.message);
     res.status(500).json(err);
   }
 }
@@ -221,25 +223,19 @@ async function updatePassword(req, res) {
     bcrypt.compare(body.oldPass, thisUser.password, function (err, result) {
       if (result) {
         if (body.newPass === body.newPassConfirm) {
-          bcrypt.compare(
-            body.newPass,
-            thisUser.password,
-            function (err, result) {
-              if (result) {
-                res.json({
-                  err: "New password cannot be same as Old Password!",
-                });
-                return;
-              } else {
-                thisUser.password = bcrypt.hashSync(body.newPass, 10);
-                User.findByIdAndUpdate(req.params.id, thisUser).then(() => {
-                  res
-                    .status(200)
-                    .json({ msg: "Password updated Sucessfully!" });
-                });
-              }
+          bcrypt.compare(body.newPass, thisUser.password, function (err, result) {
+            if (result) {
+              res.json({
+                err: "New password cannot be same as Old Password!",
+              });
+              return;
+            } else {
+              thisUser.password = bcrypt.hashSync(body.newPass, 10);
+              User.findByIdAndUpdate(req.params.id, thisUser).then(() => {
+                res.status(200).json({ msg: "Password updated Sucessfully!" });
+              });
             }
-          );
+          });
         } else {
           res.json({ err: "Please Confirm your Password!" });
           return;
@@ -260,8 +256,7 @@ async function forgetPassword(req, res) {
       res.status(404).json({ err: "User not found!" });
       return;
     }
-    var chars =
-      "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    var chars = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let password = "";
     for (var i = 0; i <= 8; i++) {
       var randomNumber = Math.floor(Math.random() * chars.length);

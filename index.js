@@ -19,11 +19,11 @@ app.use("/uploads/images", express.static("./uploads/images"));
 app.use("/uploads/pdf", express.static("./uploads/pdf"));
 app.use("/uploads/sliders", express.static("./uploads/sliders"));
 
-app.use("/", (req, res) => {
-  res.send(
-    `<script>window.location.href='${process.env.RETURN_URL}';</script>`
-  );
-});
+// app.use("/", (req, res) => {
+//   res.send(
+//     `<script>window.location.href='${process.env.RETURN_URL}';</script>`
+//   );
+// });
 
 //? listening to server
 app.listen(port, () => console.log("Server is running on port: " + port));

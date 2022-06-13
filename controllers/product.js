@@ -1,5 +1,6 @@
 const db = require("../utils/db");
 const Product = db.Product;
+const Order = db.Order;
 
 async function getAllProducts(req, res) {
   try {
@@ -107,9 +108,7 @@ async function getProductByID(req, res) {
       { $sample: { size: 8 } },
     ]);
 
-    res
-      .status(200)
-      .json({ product: product, relatedProducts: relatedProducts });
+    res.status(200).json({ product: product, relatedProducts: relatedProducts });
   } catch (err) {
     res.status(500).json(err);
   }
@@ -217,9 +216,7 @@ async function featureProduct(req, res) {
       if (singleProduct.featured) {
         res.status(200).json({ msg: "Product Added to Featured Products!" });
       } else {
-        res
-          .status(200)
-          .json({ msg: "Product Removed from Featured Products!" });
+        res.status(200).json({ msg: "Product Removed from Featured Products!" });
       }
     });
   } catch (err) {
@@ -241,6 +238,65 @@ async function getLatestProducts(req, res) {
 
     res.json(latestProducts);
   } catch (err) {
+    res.status(500).json(err);
+  }
+}
+
+function sortArray(arr) {
+  "use strict";
+
+  var counts = arr.reduce((carry, elem) => {
+    carry[elem] = (carry[elem] || 0) + 1;
+    return carry;
+  }, {});
+  return arr.sort((a, b) => (counts[b] == counts[a] ? b - a : counts[b] - counts[a]));
+}
+
+async function getRecommended(req, res) {
+  try {
+    const userId = req.params.uid;
+    let order = [];
+    if (userId !== "null") {
+      order = await Order.find({ userId }).populate({
+        path: "cartId",
+        populate: {
+          path: "product.productId",
+          model: "product",
+        },
+      });
+    } else {
+      order = await Order.find().populate({
+        path: "cartId",
+        populate: {
+          path: "product.productId",
+          model: "product",
+        },
+      });
+    }
+
+    let categoryList = [];
+    order.map((item) => {
+      item.cartId.product.map((item) => {
+        categoryList.push(item.productId.categoryId);
+      });
+    });
+    categoryList = sortArray(categoryList);
+
+    let temp = [];
+    categoryList = categoryList.map((item, index) => {
+      if (index !== 0) {
+        if (categoryList[index - 1].toString() !== categoryList[index].toString()) {
+          temp.push(item);
+        }
+      } else {
+        temp.push(item);
+      }
+    });
+
+    const product = await Product.find({ categoryId: { $in: temp } }).limit(10);
+    res.json({ recommeded: product });
+  } catch (err) {
+    console.log("error----->", err.message);
     res.status(500).json(err);
   }
 }
@@ -302,4 +358,5 @@ module.exports = {
   getFeaturedProducts,
   getLatestProducts,
   getByCategoryID,
+  getRecommended,
 };

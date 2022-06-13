@@ -25,16 +25,12 @@ async function addToCart(req, res) {
       });
       if (chk) {
         cart.product[index].quatity += parseInt(req.body.quatity);
-        let data = await Cart.findByIdAndUpdate(cart._id, cart).populate(
-          "product.productId"
-        );
+        let data = await Cart.findByIdAndUpdate(cart._id, cart).populate("product.productId");
         res.status(200).json({ msg: "Product Added to Cart.", data });
         return;
       } else {
         cart.product.push(req.body);
-        let data = await Cart.findByIdAndUpdate(cart._id, cart).populate(
-          "product.productId"
-        );
+        let data = await Cart.findByIdAndUpdate(cart._id, cart).populate("product.productId");
         res.status(200).json({ msg: "Product Added to Cart.", data });
         return;
       }
@@ -102,7 +98,7 @@ async function getCart(req, res) {
       userId: req.params.uid,
       status: false,
     }).populate("product.productId");
-    if(cart !== null){
+    if (cart !== null) {
       cart.product.forEach((doc, index) => {
         let price = doc.productId.price * doc.quatity;
         goodsTotal += price;
@@ -129,6 +125,7 @@ async function getCart(req, res) {
     cart = { cart: cart, calc: calc };
     res.status(200).json(cart);
   } catch (err) {
+    console.log(err.message);
     res.status(500).json(err);
   }
 }
@@ -136,7 +133,7 @@ async function getCart(req, res) {
 async function removeFromCart(req, res) {
   let index = -1;
   try {
-    let cart = await Cart.findOne({ userId: req.params.uid });
+    let cart = await Cart.findOne({ userId: req.params.uid, status: false });
     cart.product.forEach((singleProduct, i) => {
       if (singleProduct.productId == req.params.id) {
         index = i; //? Index no
@@ -145,6 +142,7 @@ async function removeFromCart(req, res) {
     if (index >= 0) {
       cart.product.splice(index, 1);
     }
+
     await Cart.findByIdAndUpdate(cart._id, cart).then(() => {
       res.status(200).json({ msg: "Product Deleted from Cart." });
     });

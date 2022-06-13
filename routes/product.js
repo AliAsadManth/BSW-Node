@@ -14,12 +14,13 @@ const {
   getFeaturedProducts,
   getLatestProducts,
   getByCategoryID,
+  getRecommended,
 } = require("../controllers/product");
 
 //? Image Storage
 const uploads_folder = "./uploads";
-const img_folder = uploads_folder+"/images";
-const pdf_folder = uploads_folder+"/pdf";
+const img_folder = uploads_folder + "/images";
+const pdf_folder = uploads_folder + "/pdf";
 if (!fs.existsSync(uploads_folder)) {
   fs.mkdirSync(uploads_folder);
 }
@@ -42,11 +43,7 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    let fileName =
-      Date.now().toString() +
-      Math.random().toString(8).split(".").pop() +
-      "." +
-      file.originalname.split(".").pop();
+    let fileName = Date.now().toString() + Math.random().toString(8).split(".").pop() + "." + file.originalname.split(".").pop();
     cb(null, fileName);
   },
 });
@@ -61,6 +58,7 @@ router.post("/create", uploader, addProduct);
 router.get("/search", searchProducts);
 router.get("/featured", getFeaturedProducts);
 router.get("/getlatest", getLatestProducts);
+router.get("/recommended/:uid", getRecommended);
 router.get("/getByCatId/:cid", getByCategoryID);
 router.get("/:id", getProductByID);
 router.put("/:id/update", uploader, updateProduct);

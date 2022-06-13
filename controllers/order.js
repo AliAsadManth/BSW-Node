@@ -198,11 +198,7 @@ function buildPDF(dataCallback, endCallback, data) {
   doc
     .fontSize(10)
     .text(`Invoice Number: ${data.invoiceNo}`, 50, 180)
-    .text(
-      `Invoice Date: ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`,
-      50,
-      195
-    )
+    .text(`Invoice Date: ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`, 50, 195)
     .text(`Amount: $${data.grandTotal}`, 50, 210)
 
     .text(data.name, 300, 180)
@@ -435,7 +431,7 @@ async function Webhook(req, res) {
     event = stripe.webhooks.constructEvent(
       req.rawBody,
       sig,
-      "whsec_HkL529upgK9PrGdCng7oYwMYrHxC8mWT" //////webhook scret key
+      "whsec_e228e60d8a650f499526621bc4dbc6d5e166934d1e50867e50da8a33abb90281" //////webhook scret key
     );
   } catch (error) {
     res.status(400).send(`Webhook Error: ${err.message}`);
@@ -479,6 +475,7 @@ async function Webhook(req, res) {
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
+  res.send();
 }
 
 module.exports = {
